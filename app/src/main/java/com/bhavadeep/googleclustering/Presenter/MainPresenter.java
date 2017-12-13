@@ -1,6 +1,7 @@
 package com.bhavadeep.googleclustering.Presenter;
 
 import com.bhavadeep.googleclustering.Models.Result;
+import com.bhavadeep.googleclustering.Reftrofit.Interactor;
 
 import java.util.List;
 

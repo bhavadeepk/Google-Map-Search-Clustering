@@ -1,10 +1,14 @@
-package com.bhavadeep.googleclustering.Presenter;
+package com.bhavadeep.googleclustering.Reftrofit;
 
 import android.support.annotation.NonNull;
 import android.util.Log;
 
+import com.bhavadeep.googleclustering.BuildConfig;
 import com.bhavadeep.googleclustering.Models.APIResult;
 import com.bhavadeep.googleclustering.Models.Result;
+import com.bhavadeep.googleclustering.Presenter.IModelInteractor;
+import com.bhavadeep.googleclustering.Presenter.MainPresenter;
+import com.bhavadeep.googleclustering.Presenter.OnLoadFinshListener;
 import com.bhavadeep.googleclustering.Reftrofit.RetrofitClass;
 
 import java.util.List;
@@ -25,9 +29,9 @@ public class Interactor implements Callback<APIResult>, IModelInteractor {
     RetrofitClass rf = new RetrofitClass();
     OnLoadFinshListener listener;
     String region = "us";
-    private final String  API_KEY = "AIzaSyAgmdsFiMKjxIAxrP-DdoFO98hBWboZ12g";
+    private final String  API_KEY = BuildConfig.GOOGLE_MAPS_API_KEY_UNREGISTERED ;
 
-    Interactor(OnLoadFinshListener loadFinshListener) {
+    public Interactor(OnLoadFinshListener loadFinshListener) {
         listener = loadFinshListener;
     }
 

@@ -17,7 +17,12 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
         debug {
-            manifestPlaceholders = [ google_maps_api_key:"AIzaSyB8yoooSBnaDhe2mOGZoz6vOfmRUIZTnnE"]
+            resValue "string", "google_maps_key_unregisterd",
+                    (project.findProperty("GOOGLE_MAPS_API_KEY_UNREGISTERED") ?: "")
+            buildConfigField("String", "GOOGLE_MAPS_API_KEY_UNREGISTERED", 'google_maps_key_unregisterd')
+            resValue "string", "google_maps_key",
+                    (project.findProperty("GOOGLE_MAPS_API_KEY") ?: "")
+            manifestPlaceholders = [ google_maps_api_key:'google_maps_key']
         }
     }
 
