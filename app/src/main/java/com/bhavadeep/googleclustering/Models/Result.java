@@ -32,21 +32,7 @@ public class Result {
     private OpeningHours openingHours;
     @Expose
     private List<Photo> photos = null;
-    @SerializedName("place_id")
-    @Expose
-    private String placeId;
-    @Expose
-    private String scope;
-    @SerializedName("alt_ids")
-    @Expose
-    private List<AltId> altIds = null;
-    @Expose
-    private String reference;
-    @Expose
-    private List<String> types = null;
-    @SerializedName("vicinity")
-    @Expose
-    private String vicinity;
+
 
     /**
      * No args constructor for use in serialization
@@ -60,17 +46,11 @@ public class Result {
      * @param photos
      * @param id
      * @param icon
-     * @param vicinity
-     * @param scope
-     * @param placeId
      * @param openingHours
      * @param name
-     * @param altIds
-     * @param types
-     * @param reference
      * @param geometry
      */
-    public Result(Geometry geometry, String icon, String id, String name, OpeningHours openingHours, List<Photo> photos, String placeId, String scope, List<AltId> altIds, String reference, List<String> types, String vicinity) {
+    public Result(Geometry geometry, String icon, String id, String name, OpeningHours openingHours, List<Photo> photos) {
         super();
         this.geometry = geometry;
         this.icon = icon;
@@ -78,12 +58,6 @@ public class Result {
         this.name = name;
         this.openingHours = openingHours;
         this.photos = photos;
-        this.placeId = placeId;
-        this.scope = scope;
-        this.altIds = altIds;
-        this.reference = reference;
-        this.types = types;
-        this.vicinity = vicinity;
     }
 
     public Geometry getGeometry() {
@@ -132,54 +106,6 @@ public class Result {
 
     public void setPhotos(List<Photo> photos) {
         this.photos = photos;
-    }
-
-    public String getPlaceId() {
-        return placeId;
-    }
-
-    public void setPlaceId(String placeId) {
-        this.placeId = placeId;
-    }
-
-    public String getScope() {
-        return scope;
-    }
-
-    public void setScope(String scope) {
-        this.scope = scope;
-    }
-
-    public List<AltId> getAltIds() {
-        return altIds;
-    }
-
-    public void setAltIds(List<AltId> altIds) {
-        this.altIds = altIds;
-    }
-
-    public String getReference() {
-        return reference;
-    }
-
-    public void setReference(String reference) {
-        this.reference = reference;
-    }
-
-    public List<String> getTypes() {
-        return types;
-    }
-
-    public void setTypes(List<String> types) {
-        this.types = types;
-    }
-
-    public String getVicinity() {
-        return vicinity;
-    }
-
-    public void setVicinity(String vicinity) {
-        this.vicinity = vicinity;
     }
 
 }

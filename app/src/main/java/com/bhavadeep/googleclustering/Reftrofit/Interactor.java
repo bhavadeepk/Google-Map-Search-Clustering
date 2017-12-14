@@ -7,16 +7,13 @@ import com.bhavadeep.googleclustering.BuildConfig;
 import com.bhavadeep.googleclustering.Models.APIResult;
 import com.bhavadeep.googleclustering.Models.Result;
 import com.bhavadeep.googleclustering.Presenter.IModelInteractor;
-import com.bhavadeep.googleclustering.Presenter.MainPresenter;
-import com.bhavadeep.googleclustering.Presenter.OnLoadFinshListener;
-import com.bhavadeep.googleclustering.Reftrofit.RetrofitClass;
+import com.bhavadeep.googleclustering.Presenter.OnLoadFinishListener;
 
 import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-import retrofit2.Retrofit;
 
 /**
  * Created by ${Bhavadeep} on 12/12/2017.
@@ -27,11 +24,11 @@ import retrofit2.Retrofit;
 public class Interactor implements Callback<APIResult>, IModelInteractor {
 
     RetrofitClass rf = new RetrofitClass();
-    OnLoadFinshListener listener;
+    OnLoadFinishListener listener;
     String region = "us";
     private final String  API_KEY = BuildConfig.GOOGLE_MAPS_API_KEY_UNREGISTERED ;
 
-    public Interactor(OnLoadFinshListener loadFinshListener) {
+    public Interactor(OnLoadFinishListener loadFinshListener) {
         listener = loadFinshListener;
     }
 
@@ -43,12 +40,12 @@ public class Interactor implements Callback<APIResult>, IModelInteractor {
             if (apiResult != null){
                 if(apiResult.getStatus().equals("OK")) {
                     List<Result> results = apiResult.getResults();
-                    listener.OnLoadFinsh(results);
+                    listener.OnLoadFinish(results);
                 }
                 else
                 {
                     Log.e("API ERROR :", apiResult.getStatus());
-                    listener.OnLoadFailed();
+                    listener.OnLoadFailed(apiResult.getStatus());
                 }
 
             }
@@ -58,7 +55,7 @@ public class Interactor implements Callback<APIResult>, IModelInteractor {
     @Override
     public void onFailure(@NonNull Call<APIResult> call, @NonNull Throwable t) {
         Log.e("Retrofit Failure :", t.getMessage());
-        listener.OnLoadFailed();
+        listener.OnLoadFailed(t.getMessage());
     }
 
     @Override

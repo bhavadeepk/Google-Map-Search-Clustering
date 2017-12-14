@@ -11,4 +11,6 @@ import java.util.List;
 public interface IViewUpdater {
 
     public void updateView(List<Result> results);
+
+    void updateFailed(String message);
 }

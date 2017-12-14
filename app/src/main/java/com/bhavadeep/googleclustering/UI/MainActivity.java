@@ -17,17 +17,19 @@ import com.google.android.gms.common.GoogleApiAvailability;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity implements MapViewFragment.OnMapFragmentInteractionListener{
+public class MainActivity extends AppCompatActivity implements MapViewFragment.OnMapFragmentInteractionListener, IViewUpdater{
 
     FloatingActionButton fabMain;
     FloatingActionButton fabList;
     FloatingActionButton fabMap;
+    MainPresenter presenter;
     private boolean isFabMenuOpen = false;
     MapViewFragment mapViewFragment;
     ListFragment listFragment;
     final String TAG_MAP = "Map";
     final String TAG_LIST = "List";
     String activeFragmentTag = TAG_MAP;
+    List<Result> resultList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,10 +42,13 @@ public class MainActivity extends AppCompatActivity implements MapViewFragment.O
             listFragment = ListFragment.newInstance();
             getFragmentManager().beginTransaction().add(R.id.fragment_container,mapViewFragment, TAG_MAP )
                     .add(R.id.fragment_container, listFragment, TAG_LIST ).addToBackStack(TAG_LIST).commit();
+            presenter = new MainPresenter(this);
+            presenter.getResults("food");
         }
         fabMain = findViewById(R.id.floatingActionButton);
         fabList = findViewById(R.id.fab_list);
         fabMap = findViewById(R.id.fab_map);
+        resultList = new ArrayList<>();
         View.OnClickListener fabClickListener = new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -112,7 +117,22 @@ public class MainActivity extends AppCompatActivity implements MapViewFragment.O
         return false;
     }
 
-    void showToast(){
-        Toast.makeText(this,"HEY",Toast.LENGTH_LONG).show();
+    @Override
+    public void updateView(List<Result> results) {
+        if(listFragment!=null)
+            listFragment.updateView(results);
+        resultList.addAll(results);
+
+    }
+
+    @Override
+    public void updateFailed(String message) {
+
+    }
+
+    @Override
+    public void getData() {
+        if(mapViewFragment!= null)
+            mapViewFragment.updateView(resultList);
     }
 }

@@ -19,7 +19,7 @@ android {
         debug {
             resValue "string", "google_maps_key_unregisterd",
                     (project.findProperty("GOOGLE_MAPS_API_KEY_UNREGISTERED") ?: "")
-            buildConfigField("String", "GOOGLE_MAPS_API_KEY_UNREGISTERED", 'google_maps_key_unregisterd')
+            buildConfigField('String', 'GOOGLE_MAPS_API_KEY_UNREGISTERED', GOOGLE_MAPS_API_KEY_UNREGISTERED)
             resValue "string", "google_maps_key",
                     (project.findProperty("GOOGLE_MAPS_API_KEY") ?: "")
             manifestPlaceholders = [ google_maps_api_key:'google_maps_key']
@@ -29,7 +29,7 @@ android {
 }
 
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation 'com.android.support:appcompat-v7:26.1.0'
     implementation 'com.android.support.constraint:constraint-layout:1.0.2'
     testImplementation 'junit:junit:4.12'
@@ -39,4 +39,6 @@ dependencies {
     implementation 'com.android.support:design:26.1.0'
     implementation 'com.squareup.retrofit2:retrofit:2.3.0'
     implementation 'com.squareup.retrofit2:converter-gson:2.3.0'
+    compile 'com.google.maps.android:android-maps-utils:0.5+'
+    implementation 'com.squareup.picasso:picasso:2.5.2'
 }

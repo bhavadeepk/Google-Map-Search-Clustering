@@ -19,7 +19,7 @@ import com.bhavadeep.googleclustering.R;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ListFragment extends Fragment implements IViewUpdater {
+public class ListFragment extends Fragment{
     Context context;
     List<Result> resultList;
     MainPresenter presenter;
@@ -52,7 +52,6 @@ public class ListFragment extends Fragment implements IViewUpdater {
         return listFragment;
     }
 
-    @Override
     public void updateView(List<Result> results) {
         resultList.addAll(results);
     }
