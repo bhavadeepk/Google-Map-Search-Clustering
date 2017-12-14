@@ -1,8 +1,8 @@
 package com.bhavadeep.googleclustering.UI;
 
-import android.app.Activity;
 import android.app.Fragment;
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
@@ -13,16 +13,18 @@ import android.widget.ImageView;
 import com.bhavadeep.googleclustering.Models.Result;
 import com.bhavadeep.googleclustering.R;
 import com.bhavadeep.googleclustering.UI.Map.CustomClusterItem;
-import com.bhavadeep.googleclustering.UI.Map.PicassoMarkerOptions;
+import com.bhavadeep.googleclustering.UI.Map.PicassoMarker;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.maps.android.MarkerManager;
 import com.google.maps.android.clustering.Cluster;
 import com.google.maps.android.clustering.ClusterItem;
 import com.google.maps.android.clustering.ClusterManager;
@@ -133,7 +135,8 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback {
         if(!resultList.equals(results))
             resultList.addAll(results);
         if(googleMap != null) {
-            clusterManager = new ClusterManager<>(context, googleMap);
+            MarkerManager markerManager = new MarkerManager(googleMap);
+            clusterManager = new ClusterManager<>(context, googleMap, markerManager);
             googleMap.setOnCameraIdleListener(clusterManager);
             clusterManager.setRenderer(new CustomClusterRenderer());
             googleMap.setOnMarkerClickListener(clusterManager);
@@ -181,6 +184,7 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback {
         private IconGenerator singleIconGenerator;
         private IconGenerator clusterIconGenerator;
         private View clusterView;
+        private ImageView singleIconView;
 
         public CustomClusterRenderer(Context context, GoogleMap map, ClusterManager<CustomClusterItem> clusterManager) {
             super(context, map, clusterManager);
@@ -217,27 +221,27 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback {
 
         @Override
         protected void onBeforeClusterItemRendered(CustomClusterItem item, MarkerOptions markerOptions) {
-            ImageView singleIconView = new ImageView(context);
+            singleIconView = new ImageView(context);
             singleIconView.setLayoutParams(new ViewGroup.LayoutParams(dimension, dimension));
+            singleIconView.setPadding(5,5,5,5);
             singleIconGenerator.setContentView(singleIconView);
-            singleIconGenerator.makeIcon();
-            PicassoMarkerOptions picassoMarker = new PicassoMarkerOptions(getMarker(item));
-            Picasso.with(context).load(item.getIcon()).into(picassoMarker);
         }
 
         @Override
         protected void onBeforeClusterRendered(Cluster<CustomClusterItem> cluster, MarkerOptions markerOptions) {
-
+            Bitmap bitmap = clusterIconGenerator.makeIcon(String.valueOf(cluster.getSize()));
+            markerOptions.icon(BitmapDescriptorFactory.fromBitmap(bitmap));
         }
 
         @Override
         protected void onClusterItemRendered(CustomClusterItem clusterItem, Marker marker) {
 
+            PicassoMarker picassoMarker = new PicassoMarker(marker, singleIconView, singleIconGenerator);
+            Picasso.with(context).load(clusterItem.getIcon()).into(picassoMarker);
         }
 
         @Override
         protected void onClusterRendered(Cluster<CustomClusterItem> cluster, Marker marker) {
-            clusterIconGenerator.makeIcon(String.valueOf(cluster.getSize()));
         }
     }
 }

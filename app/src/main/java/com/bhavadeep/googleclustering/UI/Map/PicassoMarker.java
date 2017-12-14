@@ -2,34 +2,39 @@ package com.bhavadeep.googleclustering.UI.Map;
 
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
+import android.widget.ImageView;
 
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.maps.android.ui.IconGenerator;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 
-/**
- * Created by ${Bhavadeep} on 12/13/2017.
- */
 
-public class PicassoMarkerOptions implements Target {
-    Marker markerOptions;
 
-    public PicassoMarkerOptions(Marker markerOptions) {
-        this.markerOptions = markerOptions;
+public class PicassoMarker implements Target {
+    private Marker marker;
+    private ImageView imageView;
+    private IconGenerator iconGenerator;
+
+    public PicassoMarker(Marker marker, ImageView imageView, IconGenerator iconGenerator) {
+        this.marker = marker;
+        this.imageView = imageView;
+        this.iconGenerator = iconGenerator;
     }
+
 
     @Override
     public int hashCode() {
-        return markerOptions.hashCode();
+        return marker.hashCode();
     }
 
     @Override
     public boolean equals(Object o) {
-        if(o instanceof PicassoMarkerOptions) {
-            Marker markerOptions = ((PicassoMarkerOptions) o).markerOptions;
-            return this.markerOptions.equals(markerOptions);
+        if(o instanceof PicassoMarker) {
+            Marker marker = ((PicassoMarker) o).marker;
+            return this.marker.equals(marker);
         } else {
             return false;
         }
@@ -38,7 +43,8 @@ public class PicassoMarkerOptions implements Target {
 
     @Override
     public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
-        markerOptions.setIcon(BitmapDescriptorFactory.fromBitmap(bitmap));
+        imageView.setImageBitmap(bitmap);
+        marker.setIcon(BitmapDescriptorFactory.fromBitmap(iconGenerator.makeIcon()));
     }
 
     @Override
