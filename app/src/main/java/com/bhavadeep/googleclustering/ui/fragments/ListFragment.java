@@ -1,4 +1,4 @@
-package com.bhavadeep.googleclustering.UI;
+package com.bhavadeep.googleclustering.ui.fragments;
 
 
 import android.app.Fragment;
@@ -11,10 +11,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.bhavadeep.googleclustering.Models.Result;
-import com.bhavadeep.googleclustering.Presenter.IViewUpdater;
-import com.bhavadeep.googleclustering.Presenter.MainPresenter;
+import com.bhavadeep.googleclustering.models.Result;
 import com.bhavadeep.googleclustering.R;
+import com.bhavadeep.googleclustering.ui.adapters.RecyclerAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,7 +21,11 @@ import java.util.List;
 public class ListFragment extends Fragment{
     Context context;
     List<Result> resultList;
-    MainPresenter presenter;
+    RecyclerAdapter recyclerAdapter;
+
+    public ListFragment() {
+        resultList = new ArrayList<>();
+    }
 
     @Override
     public void onAttach(Context context) {
@@ -33,7 +36,6 @@ public class ListFragment extends Fragment{
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        resultList = new ArrayList<>();
     }
 
     @Nullable
@@ -42,17 +44,18 @@ public class ListFragment extends Fragment{
         View rootView = inflater.inflate(R.layout.fragment_list_places, container, false);
         RecyclerView rcv = rootView.findViewById(R.id.recycler_grid_view);
         GridLayoutManager layoutManager = new GridLayoutManager(context, 2);
-        RecyclerAdapter recyclerAdapter = new RecyclerAdapter();
+         recyclerAdapter = new RecyclerAdapter(context, resultList);
         rcv.setAdapter(recyclerAdapter);
+        rcv.setLayoutManager(layoutManager);
         return rootView;
     }
 
     public static ListFragment newInstance() {
-        ListFragment listFragment = new ListFragment();
-        return listFragment;
+        return new ListFragment();
     }
 
     public void updateView(List<Result> results) {
         resultList.addAll(results);
+
     }
 }

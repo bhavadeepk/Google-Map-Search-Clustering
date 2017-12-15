@@ -4,7 +4,16 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context="com.bhavadeep.googleclustering.UI.MainActivity">
+    tools:context="com.bhavadeep.googleclustering.ui.activity.MainActivity">
+
+    <android.support.v7.widget.SearchView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/_5dp"
+        android:background="@android:color/white"
+        android:elevation="@dimen/_5dp"
+        android:padding="2dp" />
+
 <FrameLayout
     android:layout_width="match_parent"
     android:layout_height="match_parent"

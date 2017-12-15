@@ -1,16 +1,17 @@
-package com.bhavadeep.googleclustering.UI;
+package com.bhavadeep.googleclustering.ui.activity;
 
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
-import com.bhavadeep.googleclustering.Models.Result;
-import com.bhavadeep.googleclustering.Presenter.IViewUpdater;
-import com.bhavadeep.googleclustering.Presenter.MainPresenter;
+import com.bhavadeep.googleclustering.models.Result;
+import com.bhavadeep.googleclustering.presenter.IViewUpdater;
+import com.bhavadeep.googleclustering.presenter.MainPresenter;
 import com.bhavadeep.googleclustering.R;
+import com.bhavadeep.googleclustering.ui.fragments.ListFragment;
+import com.bhavadeep.googleclustering.ui.fragments.MapViewFragment;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 
@@ -40,10 +41,10 @@ public class MainActivity extends AppCompatActivity implements MapViewFragment.O
         if(savedInstanceState == null){
             mapViewFragment = MapViewFragment.newInstance();
             listFragment = ListFragment.newInstance();
-            getFragmentManager().beginTransaction().add(R.id.fragment_container,mapViewFragment, TAG_MAP )
-                    .add(R.id.fragment_container, listFragment, TAG_LIST ).addToBackStack(TAG_LIST).commit();
+            getFragmentManager().beginTransaction()
+                    .add(R.id.fragment_container,mapViewFragment, TAG_MAP ).commit();
             presenter = new MainPresenter(this);
-            presenter.getResults("food");
+            presenter.getResults("BBVA Compass");
         }
         fabMain = findViewById(R.id.floatingActionButton);
         fabList = findViewById(R.id.fab_list);
@@ -64,15 +65,19 @@ public class MainActivity extends AppCompatActivity implements MapViewFragment.O
                     if (v.getId() == R.id.fab_map) {
                         hideMenu();
                         if(getFragmentManager().findFragmentByTag(TAG_LIST) != null){
-                            getFragmentManager().beginTransaction().hide(getFragmentManager().findFragmentByTag(TAG_LIST))
-                                                        .show(getFragmentManager().findFragmentByTag(TAG_MAP)).commit();
+                           getFragmentManager().popBackStackImmediate();
                             activeFragmentTag = TAG_MAP;
                         }
                     } else {
                         hideMenu();
                         if(getFragmentManager().findFragmentByTag(TAG_MAP) != null){
-                            getFragmentManager().beginTransaction().hide(getFragmentManager().findFragmentByTag(TAG_MAP))
-                                    .show(getFragmentManager().findFragmentByTag(TAG_LIST)).commit();
+                            if(getFragmentManager().findFragmentByTag(TAG_LIST) == null){
+                                getFragmentManager().beginTransaction().replace(R.id.fragment_container, listFragment, TAG_LIST )
+                                        .addToBackStack(TAG_LIST).commit();
+                                if(listFragment != null && !resultList.isEmpty()){
+                                    listFragment.updateView(resultList);
+                                }
+                            }
                             activeFragmentTag = TAG_LIST;
                         }
 
@@ -119,15 +124,12 @@ public class MainActivity extends AppCompatActivity implements MapViewFragment.O
 
     @Override
     public void updateView(List<Result> results) {
-        if(listFragment!=null)
-            listFragment.updateView(results);
         resultList.addAll(results);
-
     }
 
     @Override
     public void updateFailed(String message) {
-
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
     }
 
     @Override
