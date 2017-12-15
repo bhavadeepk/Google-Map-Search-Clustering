@@ -3,17 +3,23 @@ package com.bhavadeep.googleclustering.UI;
 import android.app.Fragment;
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.bhavadeep.googleclustering.Models.Result;
 import com.bhavadeep.googleclustering.R;
 import com.bhavadeep.googleclustering.UI.Map.CustomClusterItem;
-import com.bhavadeep.googleclustering.UI.Map.PicassoMarker;
+import com.bhavadeep.googleclustering.UI.Map.GlideTarget;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.animation.GlideAnimation;
+import com.bumptech.glide.request.target.SimpleTarget;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
@@ -30,16 +36,20 @@ import com.google.maps.android.clustering.ClusterItem;
 import com.google.maps.android.clustering.ClusterManager;
 import com.google.maps.android.clustering.view.DefaultClusterRenderer;
 import com.google.maps.android.ui.IconGenerator;
+import com.squareup.picasso.MemoryPolicy;
 import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Target;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 
 public class MapViewFragment extends Fragment implements OnMapReadyCallback {
 
     private MapView mapView;
-
+    Target target;
 
     private GoogleMap googleMap;
     private OnMapFragmentInteractionListener listener;
@@ -84,6 +94,7 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback {
         MapsInitializer.initialize(context);
         LatLng unitedStatesLatLng = new LatLng(45,-100);
         googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(unitedStatesLatLng, (float) 3.4));
+        googleMap.getUiSettings().setMapToolbarEnabled(false);
         googleMap.setOnMapLoadedCallback(new GoogleMap.OnMapLoadedCallback() {
             @Override
             public void onMapLoaded() {
@@ -132,13 +143,13 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback {
     }
 
     public void updateView(List<Result> results) {
-        if(!resultList.equals(results))
-            resultList.addAll(results);
+        resultList.addAll(results);
         if(googleMap != null) {
             MarkerManager markerManager = new MarkerManager(googleMap);
             clusterManager = new ClusterManager<>(context, googleMap, markerManager);
             googleMap.setOnCameraIdleListener(clusterManager);
-            clusterManager.setRenderer(new CustomClusterRenderer());
+            googleMap.setOnInfoWindowClickListener(clusterManager);
+            clusterManager.setRenderer(new CustomClusterRenderer(context, googleMap, clusterManager));
             googleMap.setOnMarkerClickListener(clusterManager);
             clusterManager.setOnClusterClickListener(new ClusterManager.OnClusterClickListener<CustomClusterItem>() {
                 @Override
@@ -161,13 +172,65 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback {
                     return true;
                 }
             });
-            for (Result r : resultList) {
-                LatLng latLng = new LatLng(r.getGeometry().getLocation().getLat(), r.getGeometry().getLocation().getLng());
-                CustomClusterItem item = new CustomClusterItem(latLng, r.getName(), null, r.getIcon());
+            SimpleTarget<Bitmap> simpleTarget;
+            final Set<Target> targetSet = new HashSet<>();
+            for (final Result r : resultList) {
+                final LatLng latLng = new LatLng(r.getGeometry().getLocation().getLat(), r.getGeometry().getLocation().getLng());
+                final String name = r.getName();
+                final String icon = r.getIcon();
+                final String snippet = (new StringBuilder()).append(r.getGeometry().getLocation().getLat()).append(" , ")
+                        .append(r.getGeometry().getLocation().getLng()).toString();
+
+             /*   GlideTarget glideTarget = new GlideTarget(clusterManager, name, icon, latLng);
+
+
+                simpleTarget = new SimpleTarget<Bitmap>() {
+                    @Override
+                    public void onResourceReady(Bitmap bitmap, GlideAnimation<? super Bitmap> glideAnimation) {
+                        CustomClusterItem item = new CustomClusterItem(latLng, r.getName(), null, r.getIcon(), bitmap);
+                        clusterManager.addItem(item);
+                        clusterManager.cluster();
+                    }
+
+                  *//*  @Override
+                    public int hashCode() {
+                        return r.hashCode();
+                    }*//*
+                };
+                //Glide.with(context).load(r.getIcon()).asBitmap().into(simpleTarget);*/
+
+                target = new Target() {
+                    @Override
+                    public int hashCode() {
+                        return (new Object()).hashCode();
+                    }
+
+                    @Override
+            public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+
+                CustomClusterItem item = new CustomClusterItem(latLng, name, snippet, bitmap);
                 clusterManager.addItem(item);
+                clusterManager.cluster();
             }
-            clusterManager.cluster();
-        }
+
+            @Override
+            public void onBitmapFailed(Drawable errorDrawable) {
+                Log.d("Picasso:", "OnBitmapFailed");
+            }
+
+            @Override
+            public void onPrepareLoad(Drawable placeHolderDrawable) {
+                Log.d("Picasso:", "OnPreLoaded");
+            }
+        };
+       // targetSet.add(target);
+        Picasso.with(context).load(r.getIcon()).into(target);
+    }
+}
+        else {
+                Toast.makeText(context, "Maps null", Toast.LENGTH_SHORT).show();
+                listener.getData();
+                }
 
     }
 
@@ -180,7 +243,8 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback {
 
     public class CustomClusterRenderer extends DefaultClusterRenderer<CustomClusterItem> {
 
-        private final int dimension = 50;
+        private final int dimension = (int) getResources().getDimension(R.dimen._50dp);
+        private final int padding = (int) getResources().getDimension(R.dimen._5dp);
         private IconGenerator singleIconGenerator;
         private IconGenerator clusterIconGenerator;
         private View clusterView;
@@ -188,14 +252,17 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback {
 
         public CustomClusterRenderer(Context context, GoogleMap map, ClusterManager<CustomClusterItem> clusterManager) {
             super(context, map, clusterManager);
-
+            singleIconGenerator = new IconGenerator(context);
+            clusterIconGenerator = new IconGenerator(context);
+            clusterView = getActivity().getLayoutInflater().inflate(R.layout.marker_icon, null, false);
+            clusterIconGenerator.setContentView(clusterView);
         }
 
         public CustomClusterRenderer() {
             super(context, getGoogleMap(), clusterManager );
             singleIconGenerator = new IconGenerator(context);
             clusterIconGenerator = new IconGenerator(context);
-            clusterView = getActivity().getLayoutInflater().inflate(R.layout.marker_icon, null);
+            clusterView = getActivity().getLayoutInflater().inflate(R.layout.marker_icon, null, false);
             clusterIconGenerator.setContentView(clusterView);
         }
 
@@ -220,11 +287,14 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback {
         }
 
         @Override
-        protected void onBeforeClusterItemRendered(CustomClusterItem item, MarkerOptions markerOptions) {
+        protected void onBeforeClusterItemRendered(final CustomClusterItem item, MarkerOptions markerOptions) {
             singleIconView = new ImageView(context);
             singleIconView.setLayoutParams(new ViewGroup.LayoutParams(dimension, dimension));
-            singleIconView.setPadding(5,5,5,5);
+            singleIconView.setPadding(padding,padding,padding,padding);
+            singleIconView.setImageBitmap(item.getBitmap());
             singleIconGenerator.setContentView(singleIconView);
+            markerOptions.icon(BitmapDescriptorFactory.fromBitmap(singleIconGenerator.makeIcon()));
+            super.onBeforeClusterItemRendered(item, markerOptions);
         }
 
         @Override
@@ -235,9 +305,9 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback {
 
         @Override
         protected void onClusterItemRendered(CustomClusterItem clusterItem, Marker marker) {
-
-            PicassoMarker picassoMarker = new PicassoMarker(marker, singleIconView, singleIconGenerator);
-            Picasso.with(context).load(clusterItem.getIcon()).into(picassoMarker);
+          // PicassoMarker picassoMarker = new PicassoMarker(marker, singleIconView, singleIconGenerator);
+           // Picasso.with(context).load(clusterItem.getIcon()).into(picassoMarker);
+            super.onClusterItemRendered(clusterItem, marker);
         }
 
         @Override

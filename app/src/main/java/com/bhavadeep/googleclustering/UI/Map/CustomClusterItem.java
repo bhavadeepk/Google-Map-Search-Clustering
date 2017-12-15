@@ -1,5 +1,7 @@
 package com.bhavadeep.googleclustering.UI.Map;
 
+import android.graphics.Bitmap;
+
 import com.google.android.gms.maps.model.LatLng;
 import com.google.maps.android.clustering.ClusterItem;
 
@@ -11,18 +13,19 @@ public class CustomClusterItem implements ClusterItem {
     private final LatLng position;
     private final String title;
     private final String snippet;
-    private final String icon;
+    private final Bitmap bitmap;
 
-    public CustomClusterItem(LatLng position, String title, String snippet, String icon) {
+    public Bitmap getBitmap() {
+        return bitmap;
+    }
+
+    public CustomClusterItem(LatLng position, String title, String snippet, Bitmap bitmap) {
         this.position = position;
         this.title = title;
         this.snippet = snippet;
-        this.icon = icon;
+        this.bitmap = bitmap;
     }
 
-    public String getIcon() {
-        return icon;
-    }
 
     @Override
     public LatLng getPosition() {
