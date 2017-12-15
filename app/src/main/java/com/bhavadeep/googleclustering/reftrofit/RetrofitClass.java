@@ -1,25 +1,19 @@
-package com.bhavadeep.googleclustering.Reftrofit;
+package com.bhavadeep.googleclustering.reftrofit;
 
-import retrofit2.Callback;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-/**
- * Created by ${Bhavadeep} on 12/11/2017.
- */
 
-public class RetrofitClass {
+class RetrofitClass {
 
-    Retrofit retrofit;
-
-    public GooglePlacesServices getService() {
+    GooglePlacesServices getService() {
         return service;
     }
 
-    GooglePlacesServices service;
+    private GooglePlacesServices service;
 
-    public RetrofitClass() {
-        retrofit = new Retrofit.Builder()
+    RetrofitClass() {
+        Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl("https://maps.googleapis.com/maps/api/place/textsearch/")
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();

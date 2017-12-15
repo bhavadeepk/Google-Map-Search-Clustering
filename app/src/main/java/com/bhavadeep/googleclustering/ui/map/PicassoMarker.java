@@ -1,4 +1,4 @@
-package com.bhavadeep.googleclustering.UI.Map;
+package com.bhavadeep.googleclustering.ui.map;
 
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;

@@ -1,5 +1,7 @@
 
-package com.bhavadeep.googleclustering.Models;
+package com.bhavadeep.googleclustering.models;
+
+import android.graphics.Bitmap;
 
 import java.util.List;
 import com.google.gson.annotations.Expose;
@@ -10,6 +12,8 @@ public class Result {
     @SerializedName("formatted_address")
     @Expose
     private String address;
+    private Bitmap bitmap;
+    private Bitmap bitMap;
 
     public String getAddress() {
         return address;
@@ -33,6 +37,17 @@ public class Result {
     @Expose
     private List<Photo> photos = null;
 
+    public String getRating() {
+        return rating;
+    }
+
+    public void setRating(String rating) {
+        this.rating = rating;
+    }
+
+    @Expose
+    private String rating;
+
 
     /**
      * No args constructor for use in serialization
@@ -41,15 +56,7 @@ public class Result {
     public Result() {
     }
 
-    /**
-     * 
-     * @param photos
-     * @param id
-     * @param icon
-     * @param openingHours
-     * @param name
-     * @param geometry
-     */
+
     public Result(Geometry geometry, String icon, String id, String name, OpeningHours openingHours, List<Photo> photos) {
         super();
         this.geometry = geometry;
@@ -108,4 +115,11 @@ public class Result {
         this.photos = photos;
     }
 
+    public void setBitmap(Bitmap bitmap) {
+        this.bitmap = bitmap;
+    }
+
+    public Bitmap getBitMap() {
+        return bitMap;
+    }
 }

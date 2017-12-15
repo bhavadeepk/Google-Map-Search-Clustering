@@ -1,14 +1,11 @@
-package com.bhavadeep.googleclustering.Reftrofit;
+package com.bhavadeep.googleclustering.reftrofit;
 
-import com.bhavadeep.googleclustering.Models.APIResult;
+import com.bhavadeep.googleclustering.models.APIResult;
 
 import retrofit2.Call;
 import retrofit2.http.GET;
 import retrofit2.http.Query;
 
-/**
- * Created by ${Bhavadeep} on 12/11/2017.
- */
 
 public interface GooglePlacesServices {
     @GET("json")

@@ -1,13 +1,13 @@
-package com.bhavadeep.googleclustering.Reftrofit;
+package com.bhavadeep.googleclustering.reftrofit;
 
 import android.support.annotation.NonNull;
 import android.util.Log;
 
 import com.bhavadeep.googleclustering.BuildConfig;
-import com.bhavadeep.googleclustering.Models.APIResult;
-import com.bhavadeep.googleclustering.Models.Result;
-import com.bhavadeep.googleclustering.Presenter.IModelInteractor;
-import com.bhavadeep.googleclustering.Presenter.OnLoadFinishListener;
+import com.bhavadeep.googleclustering.models.APIResult;
+import com.bhavadeep.googleclustering.models.Result;
+import com.bhavadeep.googleclustering.presenter.IModelInteractor;
+import com.bhavadeep.googleclustering.presenter.OnLoadFinishListener;
 
 import java.util.List;
 
@@ -15,17 +15,14 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-/**
- * Created by ${Bhavadeep} on 12/12/2017.
- */
 
 
 
 public class Interactor implements Callback<APIResult>, IModelInteractor {
 
-    RetrofitClass rf = new RetrofitClass();
-    OnLoadFinishListener listener;
-    String region = "us";
+    private RetrofitClass rf = new RetrofitClass();
+    private OnLoadFinishListener listener;
+    private final String region = "us";
     private final String  API_KEY = BuildConfig.GOOGLE_MAPS_API_KEY_UNREGISTERED ;
 
     public Interactor(OnLoadFinishListener loadFinshListener) {
