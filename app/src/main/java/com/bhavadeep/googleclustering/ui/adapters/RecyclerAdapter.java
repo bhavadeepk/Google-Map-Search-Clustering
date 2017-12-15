@@ -26,7 +26,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.Custom
     public RecyclerAdapter(Context context, List<Result> results) {
         this.context = context;
         resultList = new ArrayList<>();
-        resultList.addAll(results);
+        resultList = results;
     }
 
     @Override

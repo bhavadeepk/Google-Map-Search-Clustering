@@ -55,7 +55,9 @@ public class ListFragment extends Fragment{
     }
 
     public void updateView(List<Result> results) {
+        resultList.clear();
         resultList.addAll(results);
-
+        if(recyclerAdapter != null)
+            recyclerAdapter.notifyDataSetChanged();
     }
 }

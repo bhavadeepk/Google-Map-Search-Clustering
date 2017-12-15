@@ -132,10 +132,10 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback {
     }
 
     public void updateView(List<Result> results) {
+        resultList.clear();
         resultList.addAll(results);
         if(googleMap != null) {
-            MarkerManager markerManager = new MarkerManager(googleMap);
-            clusterManager = new ClusterManager<>(context, googleMap, markerManager);
+            clusterManager = new ClusterManager<>(context, googleMap);
             googleMap.setOnCameraIdleListener(clusterManager);
             googleMap.setOnInfoWindowClickListener(clusterManager);
             clusterManager.setRenderer(new CustomClusterRenderer(context, googleMap, clusterManager));
@@ -161,7 +161,8 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback {
                     return true;
                 }
             });
-
+            googleMap.clear();
+            clusterManager.clearItems();
             for (final Result r : resultList) {
                 final LatLng latLng = new LatLng(r.getGeometry().getLocation().getLat(), r.getGeometry().getLocation().getLng());
                 final String name = r.getName();
@@ -180,7 +181,8 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback {
                         Log.d("Picasso:", "OnBitmapLoaded");
                 CustomClusterItem item = new CustomClusterItem(latLng, name, snippet, bitmap);
                 clusterManager.addItem(item);
-                clusterManager.cluster();
+                if(resultList.indexOf(r) == resultList.size()-1)
+                    clusterManager.cluster();
             }
 
             @Override

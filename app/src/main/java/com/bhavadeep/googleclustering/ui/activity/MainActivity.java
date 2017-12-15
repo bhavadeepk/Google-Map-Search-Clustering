@@ -14,6 +14,7 @@ import com.bhavadeep.googleclustering.ui.fragments.ListFragment;
 import com.bhavadeep.googleclustering.ui.fragments.MapViewFragment;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
+import com.lapism.searchview.SearchView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,6 +32,9 @@ public class MainActivity extends AppCompatActivity implements MapViewFragment.O
     final String TAG_LIST = "List";
     String activeFragmentTag = TAG_MAP;
     List<Result> resultList;
+    SearchView searchView;
+    boolean newQuery = false;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,6 +50,7 @@ public class MainActivity extends AppCompatActivity implements MapViewFragment.O
             presenter = new MainPresenter(this);
             presenter.getResults("BBVA Compass");
         }
+        searchView = findViewById(R.id.search_view);
         fabMain = findViewById(R.id.floatingActionButton);
         fabList = findViewById(R.id.fab_list);
         fabMap = findViewById(R.id.fab_map);
@@ -88,6 +93,27 @@ public class MainActivity extends AppCompatActivity implements MapViewFragment.O
         fabMain.setOnClickListener(fabClickListener);
         fabList.setOnClickListener(fabClickListener);
         fabMap.setOnClickListener(fabClickListener);
+        searchView.setShouldClearOnClose(true);
+
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                presenter.getResults(query);
+                newQuery = true;
+                searchView.close(true);
+                return true;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                return false;
+            }
+        });
+        searchView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+            }
+        });
 
     }
 
@@ -124,7 +150,13 @@ public class MainActivity extends AppCompatActivity implements MapViewFragment.O
 
     @Override
     public void updateView(List<Result> results) {
+        resultList.clear();
         resultList.addAll(results);
+        if(newQuery) {
+            mapViewFragment.updateView(resultList);
+            listFragment.updateView(resultList);
+            newQuery = false;
+        }
     }
 
     @Override
@@ -136,5 +168,13 @@ public class MainActivity extends AppCompatActivity implements MapViewFragment.O
     public void getData() {
         if(mapViewFragment!= null)
             mapViewFragment.updateView(resultList);
+    }
+
+    @Override
+    public void onBackPressed() {
+        if(isFabMenuOpen)
+            hideMenu();
+        else
+            super.onBackPressed();
     }
 }
