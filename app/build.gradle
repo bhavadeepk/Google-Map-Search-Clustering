@@ -22,7 +22,7 @@ android {
             buildConfigField('String', 'GOOGLE_MAPS_API_KEY_UNREGISTERED', GOOGLE_MAPS_API_KEY_UNREGISTERED)
             resValue "string", "google_maps_key",
                     (project.findProperty("GOOGLE_MAPS_API_KEY") ?: "")
-            manifestPlaceholders = [ google_maps_api_key:'google_maps_key']
+            manifestPlaceholders = [google_maps_api_key: 'google_maps_key']
         }
     }
 
@@ -35,7 +35,7 @@ dependencies {
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.1'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
-    compile 'com.google.android.gms:play-services-maps:11.6.2'
+    implementation 'com.google.android.gms:play-services-maps:11.6.2'
     implementation 'com.android.support:design:27.0.2'
     implementation 'com.squareup.retrofit2:retrofit:2.3.0'
     implementation 'com.squareup.retrofit2:converter-gson:2.3.0'

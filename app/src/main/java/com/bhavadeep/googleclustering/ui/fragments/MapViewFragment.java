@@ -23,10 +23,10 @@ import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
-import com.google.maps.android.MarkerManager;
 import com.google.maps.android.clustering.Cluster;
 import com.google.maps.android.clustering.ClusterItem;
 import com.google.maps.android.clustering.ClusterManager;
+import com.squareup.picasso.MemoryPolicy;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 
@@ -34,7 +34,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class MapViewFragment extends Fragment implements OnMapReadyCallback {
+public class MapViewFragment extends Fragment implements OnMapReadyCallback, ClusterManager.OnClusterItemInfoWindowClickListener<CustomClusterItem>, ClusterManager.OnClusterClickListener<CustomClusterItem> {
 
     private MapView mapView;
     Target target;
@@ -80,7 +80,7 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback {
         if (googleMap != null) {
             return;
         }
-
+        Log.d("Map Fragment", "OnnMapReady");
         googleMap = gMap;
         MapsInitializer.initialize(context);
         LatLng unitedStatesLatLng = new LatLng(45,-100);
@@ -140,36 +140,16 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback {
             googleMap.setOnInfoWindowClickListener(clusterManager);
             clusterManager.setRenderer(new CustomClusterRenderer(context, googleMap, clusterManager));
             googleMap.setOnMarkerClickListener(clusterManager);
-            clusterManager.setOnClusterClickListener(new ClusterManager.OnClusterClickListener<CustomClusterItem>() {
-                @Override
-                public boolean onClusterClick(Cluster<CustomClusterItem> cluster) {
-                    // Create the builder to collect all essential cluster items for the bounds.
-                    LatLngBounds.Builder builder = LatLngBounds.builder();
-                    for (ClusterItem item : cluster.getItems()) {
-                        builder.include(item.getPosition());
-                    }
-                    // Get the LatLngBounds
-                    final LatLngBounds bounds = builder.build();
-
-                    // Animate camera to the bounds
-                    try {
-                        getGoogleMap().animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 100));
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-
-                    return true;
-                }
-            });
+            googleMap.setInfoWindowAdapter(clusterManager.getMarkerManager());
+            clusterManager.setOnClusterClickListener(this);
+            clusterManager.setOnClusterItemInfoWindowClickListener(this);
             googleMap.clear();
             clusterManager.clearItems();
-            for (final Result r : resultList) {
-                final LatLng latLng = new LatLng(r.getGeometry().getLocation().getLat(), r.getGeometry().getLocation().getLng());
-                final String name = r.getName();
-                final String snippet = (new StringBuilder()).append(r.getGeometry().getLocation().getLat()).append(" , ")
-                        .append(r.getGeometry().getLocation().getLng()).append("\n").append(r.getAddress())
-                        .append("Ratings : ").append((r.getRating()!=null ? r.getRating() : "Unavailable")).toString();
-
+            for (final Result result : resultList) {
+                final LatLng latLng = new LatLng(result.getGeometry().getLocation().getLat(), result.getGeometry().getLocation().getLng());
+                final String name = result.getName();
+                final String address = result.getAddress();
+                final String ratings = result.getRating();
                 target = new Target() {
                     @Override
                     public int hashCode() {
@@ -179,9 +159,9 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback {
                     @Override
             public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
                         Log.d("Picasso:", "OnBitmapLoaded");
-                CustomClusterItem item = new CustomClusterItem(latLng, name, snippet, bitmap);
+                        CustomClusterItem item = new CustomClusterItem(latLng, name, address, ratings, bitmap);
                 clusterManager.addItem(item);
-                if(resultList.indexOf(r) == resultList.size()-1)
+                        if (resultList.indexOf(result) == resultList.size() - 1)
                     clusterManager.cluster();
             }
 
@@ -195,7 +175,7 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback {
                 Log.d("Picasso:", "OnPreLoaded");
             }
         };
-        Picasso.with(context).load(r.getIcon()).into(target);
+                Picasso.with(context).load(result.getIcon()).memoryPolicy(MemoryPolicy.NO_CACHE, MemoryPolicy.NO_STORE).into(target);
     }
 }
         else {
@@ -205,11 +185,39 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback {
 
     }
 
+    @Override
+    public void onClusterItemInfoWindowClick(CustomClusterItem customClusterItem) {
+        listener.showDetails(customClusterItem);
+    }
+
+    @Override
+    public boolean onClusterClick(Cluster<CustomClusterItem> cluster) {
+        {
+            // Create the builder to collect all essential cluster items for the bounds.
+            LatLngBounds.Builder builder = LatLngBounds.builder();
+            for (ClusterItem item : cluster.getItems()) {
+                builder.include(item.getPosition());
+            }
+            // Get the LatLngBounds
+            final LatLngBounds bounds = builder.build();
+
+            // Animate camera to the bounds
+            try {
+                getGoogleMap().animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 100));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            return true;
+        }
+    }
+
 
     public interface OnMapFragmentInteractionListener{
 
         void getData( );
 
+        void showDetails(CustomClusterItem customClusterItem);
     }
 
    }

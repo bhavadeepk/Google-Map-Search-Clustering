@@ -72,11 +72,11 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.Custom
 
         CustomViewHolder(View view) {
             super(view);
-            titleTextView = view.findViewById(R.id.title);
+            titleTextView = view.findViewById(R.id.title_info);
             iconImageView = view.findViewById(R.id.imageView);
             lattitudeTextView = view.findViewById(R.id.latitude_value);
             longitudeTextView = view.findViewById(R.id.longitude_value);
-            addressTextView = view.findViewById(R.id.address);
+            addressTextView = view.findViewById(R.id.address_info);
             ratingsTextView = view.findViewById(R.id.rating_value);
 
         }

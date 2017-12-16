@@ -5,27 +5,34 @@ import android.graphics.Bitmap;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.maps.android.clustering.ClusterItem;
 
-/**
- * Created by ${Bhavadeep} on 12/13/2017.
- */
+
 
 public class CustomClusterItem implements ClusterItem {
     private final LatLng position;
     private final String title;
-    private final String snippet;
+    private final String address;
+    private final String ratings;
     private final Bitmap bitmap;
 
-    public Bitmap getBitmap() {
-        return bitmap;
-    }
-
-    public CustomClusterItem(LatLng position, String title, String snippet, Bitmap bitmap) {
+    public CustomClusterItem(LatLng position, String title, String address, String ratings, Bitmap bitmap) {
         this.position = position;
         this.title = title;
-        this.snippet = snippet;
+        this.address = address;
+        this.ratings = ratings;
         this.bitmap = bitmap;
     }
 
+    String getAddress() {
+        return address;
+    }
+
+    Bitmap getBitmap() {
+        return bitmap;
+    }
+
+    String getRatings() {
+        return ratings;
+    }
 
     @Override
     public LatLng getPosition() {
@@ -39,6 +46,7 @@ public class CustomClusterItem implements ClusterItem {
 
     @Override
     public String getSnippet() {
-        return snippet;
+        return null;
     }
+
 }

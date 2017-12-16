@@ -1,8 +1,10 @@
 package com.bhavadeep.googleclustering.ui.activity;
 
+
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
@@ -12,6 +14,7 @@ import com.bhavadeep.googleclustering.presenter.MainPresenter;
 import com.bhavadeep.googleclustering.R;
 import com.bhavadeep.googleclustering.ui.fragments.ListFragment;
 import com.bhavadeep.googleclustering.ui.fragments.MapViewFragment;
+import com.bhavadeep.googleclustering.ui.map.CustomClusterItem;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.lapism.searchview.SearchView;
@@ -34,7 +37,6 @@ public class MainActivity extends AppCompatActivity implements MapViewFragment.O
     List<Result> resultList;
     SearchView searchView;
     boolean newQuery = false;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -95,6 +97,9 @@ public class MainActivity extends AppCompatActivity implements MapViewFragment.O
         fabMap.setOnClickListener(fabClickListener);
         searchView.setShouldClearOnClose(true);
 
+        // searchView.setNavigationIcon(R.drawable.ic_search);
+        searchView.setArrowOnly(true);
+
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
@@ -153,6 +158,7 @@ public class MainActivity extends AppCompatActivity implements MapViewFragment.O
         resultList.clear();
         resultList.addAll(results);
         if(newQuery) {
+            Log.d("Main Activity", "New Query Update view");
             mapViewFragment.updateView(resultList);
             listFragment.updateView(resultList);
             newQuery = false;
@@ -166,8 +172,15 @@ public class MainActivity extends AppCompatActivity implements MapViewFragment.O
 
     @Override
     public void getData() {
-        if(mapViewFragment!= null)
+        if (mapViewFragment != null) {
+            Log.d("MainActivity", "Sending to Map Update View");
             mapViewFragment.updateView(resultList);
+        }
+    }
+
+    @Override
+    public void showDetails(CustomClusterItem customClusterItem) {
+
     }
 
     @Override

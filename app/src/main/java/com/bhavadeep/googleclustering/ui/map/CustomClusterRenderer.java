@@ -16,28 +16,29 @@ import com.google.maps.android.clustering.ClusterManager;
 import com.google.maps.android.clustering.view.DefaultClusterRenderer;
 import com.google.maps.android.ui.IconGenerator;
 
-/**
- * Created by ${Bhavadeep} on 12/14/2017.
- */
 
-public class CustomClusterRenderer extends DefaultClusterRenderer<CustomClusterItem> {
+public class CustomClusterRenderer extends DefaultClusterRenderer<CustomClusterItem> implements ClusterManager.OnClusterItemClickListener<CustomClusterItem> {
 
     private final int dimension;
     private final int padding;
     private IconGenerator singleIconGenerator;
     private IconGenerator clusterIconGenerator;
-    private View clusterView;
     private ImageView singleIconView;
+    private CustomInfoWindowAdapter infoWindowAdapter;
 
     public CustomClusterRenderer(Context context, GoogleMap map, ClusterManager<CustomClusterItem> clusterManager) {
         super(context, map, clusterManager);
         singleIconGenerator = new IconGenerator(context);
         clusterIconGenerator = new IconGenerator(context);
         singleIconView = new ImageView(context);
-        clusterView = ((Activity)context).getLayoutInflater().inflate(R.layout.marker_icon, null, false);
+        View clusterView = ((Activity) context).getLayoutInflater().inflate(R.layout.marker_icon, null, false);
         dimension = (int) context.getResources().getDimension(R.dimen._50dp);
         padding = (int) context.getResources().getDimension(R.dimen._5dp);
         clusterIconGenerator.setContentView(clusterView);
+        clusterManager.setOnClusterItemClickListener(this);
+        infoWindowAdapter = new CustomInfoWindowAdapter(context);
+        map.setOnMarkerClickListener(clusterManager);
+        clusterManager.getMarkerCollection().setOnInfoWindowAdapter(infoWindowAdapter);
     }
 
     @Override
@@ -76,5 +77,10 @@ public class CustomClusterRenderer extends DefaultClusterRenderer<CustomClusterI
         markerOptions.icon(BitmapDescriptorFactory.fromBitmap(bitmap));
     }
 
+    @Override
+    public boolean onClusterItemClick(CustomClusterItem customClusterItem) {
+        infoWindowAdapter.setItemClicked(customClusterItem);
+        return false;
+    }
 }
 
