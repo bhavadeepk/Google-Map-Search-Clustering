@@ -22,42 +22,68 @@ public class ListFragment extends Fragment{
     Context context;
     List<Result> resultList;
     RecyclerAdapter recyclerAdapter;
+    OnListFragmentListener listener;
+    View rootView;
 
     public ListFragment() {
-        resultList = new ArrayList<>();
+
     }
 
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        this.context = context;
+        if (context instanceof OnListFragmentListener) {
+            listener = (OnListFragmentListener) context;
+            this.context = context;
+        } else {
+            throw new RuntimeException(context.toString()
+                    + " must implement OnFragmentInteractionListener");
+        }
     }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        resultList = new ArrayList<>();
+        setRetainInstance(true);
     }
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_list_places, container, false);
+
+        rootView = inflater.inflate(R.layout.fragment_list_places, container, false);
         RecyclerView rcv = rootView.findViewById(R.id.recycler_grid_view);
         GridLayoutManager layoutManager = new GridLayoutManager(context, 2);
-         recyclerAdapter = new RecyclerAdapter(context, resultList);
+        recyclerAdapter = new RecyclerAdapter(getActivity(), resultList);
         rcv.setAdapter(recyclerAdapter);
         rcv.setLayoutManager(layoutManager);
+        if (resultList.isEmpty())
+            listener.getListData();
         return rootView;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
     }
 
     public static ListFragment newInstance() {
         return new ListFragment();
     }
 
+
     public void updateView(List<Result> results) {
         resultList.clear();
         resultList.addAll(results);
-        if(recyclerAdapter != null)
-            recyclerAdapter.notifyDataSetChanged();
+        recyclerAdapter.notifyDataSetChanged();
+    }
+
+
+    public interface OnListFragmentListener {
+        void getListData();
     }
 }
+
+

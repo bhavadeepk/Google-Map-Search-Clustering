@@ -12,8 +12,6 @@ public class Result {
     @SerializedName("formatted_address")
     @Expose
     private String address;
-    private Bitmap bitmap;
-    private Bitmap bitMap;
 
     public String getAddress() {
         return address;
@@ -115,11 +113,4 @@ public class Result {
         this.photos = photos;
     }
 
-    public void setBitmap(Bitmap bitmap) {
-        this.bitmap = bitmap;
-    }
-
-    public Bitmap getBitMap() {
-        return bitMap;
-    }
 }

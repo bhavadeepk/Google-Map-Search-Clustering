@@ -22,15 +22,15 @@ public class CustomClusterItem implements ClusterItem {
         this.bitmap = bitmap;
     }
 
-    String getAddress() {
+    public String getAddress() {
         return address;
     }
 
-    Bitmap getBitmap() {
+    public Bitmap getBitmap() {
         return bitmap;
     }
 
-    String getRatings() {
+    public String getRatings() {
         return ratings;
     }
 

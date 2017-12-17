@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:id="@+id/main_layout"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context="com.bhavadeep.googleclustering.ui.activity.MainActivity">
 
@@ -14,10 +15,10 @@
     android:id="@+id/fragment_container"/>
 
     <com.lapism.searchview.SearchView
+        android:id="@+id/search_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/search_view"
-        />
+        android:layout_margin="2dp" />
 
 
 
@@ -54,4 +55,4 @@
         app:srcCompat="@drawable/ic_action_name" />
 
 
-</android.support.design.widget.CoordinatorLayout>
+</FrameLayout>

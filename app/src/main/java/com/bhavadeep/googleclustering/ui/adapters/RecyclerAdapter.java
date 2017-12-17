@@ -10,6 +10,8 @@ import android.widget.TextView;
 
 import com.bhavadeep.googleclustering.models.Result;
 import com.bhavadeep.googleclustering.R;
+import com.bhavadeep.googleclustering.ui.activity.MainActivity;
+import com.bhavadeep.googleclustering.ui.fragments.ListFragment;
 import com.bumptech.glide.Glide;
 
 import java.util.ArrayList;
@@ -47,8 +49,6 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.Custom
                     .placeholder(R.drawable.ic_action_name)
                     .fitCenter()
                     .into(holder.iconImageView);
-
-
         holder.addressTextView.setText(result.getAddress());
         String ratings = result.getRating();
         if(ratings == null)
@@ -78,6 +78,13 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.Custom
             longitudeTextView = view.findViewById(R.id.longitude_value);
             addressTextView = view.findViewById(R.id.address_info);
             ratingsTextView = view.findViewById(R.id.rating_value);
+
+            view.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    ((MainActivity) context).onListItemClicked(resultList.get(getAdapterPosition()));
+                }
+            });
 
         }
     }

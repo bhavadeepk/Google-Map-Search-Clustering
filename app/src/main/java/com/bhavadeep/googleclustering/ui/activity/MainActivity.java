@@ -1,6 +1,9 @@
 package com.bhavadeep.googleclustering.ui.activity;
 
 
+import android.annotation.SuppressLint;
+import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -12,17 +15,21 @@ import com.bhavadeep.googleclustering.models.Result;
 import com.bhavadeep.googleclustering.presenter.IViewUpdater;
 import com.bhavadeep.googleclustering.presenter.MainPresenter;
 import com.bhavadeep.googleclustering.R;
+import com.bhavadeep.googleclustering.ui.fragments.DetailsFragment;
 import com.bhavadeep.googleclustering.ui.fragments.ListFragment;
 import com.bhavadeep.googleclustering.ui.fragments.MapViewFragment;
 import com.bhavadeep.googleclustering.ui.map.CustomClusterItem;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.lapism.searchview.SearchView;
+import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Target;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity implements MapViewFragment.OnMapFragmentInteractionListener, IViewUpdater{
+public class MainActivity extends AppCompatActivity implements MapViewFragment.OnMapFragmentInteractionListener, IViewUpdater
+        , ListFragment.OnListFragmentListener {
 
     FloatingActionButton fabMain;
     FloatingActionButton fabList;
@@ -33,72 +40,93 @@ public class MainActivity extends AppCompatActivity implements MapViewFragment.O
     ListFragment listFragment;
     final String TAG_MAP = "Map";
     final String TAG_LIST = "List";
-    String activeFragmentTag = TAG_MAP;
+    String activeFragmentTag;
     List<Result> resultList;
     SearchView searchView;
     boolean newQuery = false;
+    int backCount = 0;
+    private final String TAG_DETAILS = "Details";
+    private int count;
+    private boolean isDetailsFragment = false;
 
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if(isGooglePlayServicesAvailable()){
             setContentView(R.layout.activity_main);
         }
+
+        presenter = new MainPresenter(this);
+        resultList = new ArrayList<>();
         if(savedInstanceState == null){
             mapViewFragment = MapViewFragment.newInstance();
-            listFragment = ListFragment.newInstance();
             getFragmentManager().beginTransaction()
                     .add(R.id.fragment_container,mapViewFragment, TAG_MAP ).commit();
-            presenter = new MainPresenter(this);
+            activeFragmentTag = TAG_MAP;
             presenter.getResults("BBVA Compass");
+        } else {
+            mapViewFragment = (MapViewFragment) getFragmentManager().findFragmentByTag(TAG_MAP);
+            listFragment = (ListFragment) getFragmentManager().findFragmentByTag(TAG_LIST);
+            resultList.addAll(mapViewFragment.getResultList());
         }
         searchView = findViewById(R.id.search_view);
         fabMain = findViewById(R.id.floatingActionButton);
         fabList = findViewById(R.id.fab_list);
         fabMap = findViewById(R.id.fab_map);
-        resultList = new ArrayList<>();
         View.OnClickListener fabClickListener = new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if(v.getId() == R.id.floatingActionButton){
                     if(isFabMenuOpen){
                         hideMenu();
-                    }
-                    else {
+                    } else {
                         showMenu();
                     }
-                }
-                else {
-                    if (v.getId() == R.id.fab_map) {
-                        hideMenu();
-                        if(getFragmentManager().findFragmentByTag(TAG_LIST) != null){
-                           getFragmentManager().popBackStackImmediate();
-                            activeFragmentTag = TAG_MAP;
-                        }
-                    } else {
-                        hideMenu();
-                        if(getFragmentManager().findFragmentByTag(TAG_MAP) != null){
-                            if(getFragmentManager().findFragmentByTag(TAG_LIST) == null){
-                                getFragmentManager().beginTransaction().replace(R.id.fragment_container, listFragment, TAG_LIST )
-                                        .addToBackStack(TAG_LIST).commit();
-                                if(listFragment != null && !resultList.isEmpty()){
-                                    listFragment.updateView(resultList);
-                                }
-                            }
-                            activeFragmentTag = TAG_LIST;
-                        }
+                } else if (v.getId() == R.id.fab_map) {
+                    hideMenu();
+                    if (activeFragmentTag.equals(TAG_LIST)) {/*
+                            getFragmentManager().beginTransaction().hide(getFragmentManager().findFragmentByTag(TAG_LIST))
+                                       .show(getFragmentManager().findFragmentByTag(TAG_MAP)).commit();*/
+                        getFragmentManager().popBackStack();
+                        activeFragmentTag = TAG_MAP;
 
-                     }
+                    }
+                } else if (v.getId() == R.id.fab_list) {
+                    hideMenu();
+                    if (activeFragmentTag.equals(TAG_MAP)) {
+                        if (listFragment == null) {
+                            listFragment = ListFragment.newInstance();
+                        }
+                        getFragmentManager().beginTransaction().add(R.id.fragment_container, listFragment, TAG_LIST)
+                                .addToBackStack(TAG_LIST).commit();
+                        activeFragmentTag = TAG_LIST;
+                    }
                 }
             }
         };
         fabMain.setOnClickListener(fabClickListener);
         fabList.setOnClickListener(fabClickListener);
         fabMap.setOnClickListener(fabClickListener);
-        searchView.setShouldClearOnClose(true);
 
-        // searchView.setNavigationIcon(R.drawable.ic_search);
+
+        searchView.setShouldClearOnClose(true);
         searchView.setArrowOnly(true);
+        searchView.setOnMenuClickListener(new SearchView.OnMenuClickListener() {
+            @Override
+            public void onMenuClick() {
+                if (activeFragmentTag.equals(TAG_LIST)) {
+                    onBackPressed();
+                } else {
+                    if (backCount > 0)
+                        onBackPressed();
+                    else {
+                        Toast.makeText(MainActivity.this, "Press again to Exit", Toast.LENGTH_SHORT).show();
+                        backCount++;
+                    }
+                }
+            }
+        });
 
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
@@ -114,17 +142,32 @@ public class MainActivity extends AppCompatActivity implements MapViewFragment.O
                 return false;
             }
         });
-        searchView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-            }
-        });
+    }
 
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putString("active_fragment_tag", activeFragmentTag);
+        outState.putBoolean("is_details_fragment", isDetailsFragment);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        activeFragmentTag = savedInstanceState.getString("active_fragment_tag");
+        isDetailsFragment = savedInstanceState.getBoolean("is_details_fragment");
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (isDetailsFragment)
+            hideFabsandSearch();
     }
 
     private void showMenu() {
-        fabMap.setClickable(true);
         fabList.setClickable(true);
+        fabMap.setClickable(true);
         fabMap.animate().translationX(-getResources().getDimension(R.dimen._100dp)).rotation(360).setDuration(300);
         fabList.animate().translationY(-getResources().getDimension(R.dimen._100dp)).rotation(360).setDuration(300);
         isFabMenuOpen = true;
@@ -156,6 +199,7 @@ public class MainActivity extends AppCompatActivity implements MapViewFragment.O
     @Override
     public void updateView(List<Result> results) {
         resultList.clear();
+        count = results.size();
         resultList.addAll(results);
         if(newQuery) {
             Log.d("Main Activity", "New Query Update view");
@@ -172,22 +216,107 @@ public class MainActivity extends AppCompatActivity implements MapViewFragment.O
 
     @Override
     public void getData() {
-        if (mapViewFragment != null) {
             Log.d("MainActivity", "Sending to Map Update View");
+            mapViewFragment.updateView(resultList);
+    }
+
+    @Override
+    public void getListData() {
+        listFragment.updateView(resultList);
+    }
+
+    @Override
+    public void showDetails(CustomClusterItem item) {
+        if (isFabMenuOpen)
+            hideMenu();
+        String latitude = String.valueOf(item.getPosition().latitude);
+        String longitute = String.valueOf(item.getPosition().longitude);
+        DetailsFragment detailsFragment = DetailsFragment.newInstance(item.getTitle(), latitude, longitute, item.getAddress(),
+                item.getRatings(), item.getBitmap());
+        getFragmentManager().beginTransaction()
+                .replace(R.id.fragment_container, detailsFragment, TAG_DETAILS).addToBackStack(TAG_DETAILS)
+                .commit();
+        hideFabsandSearch();
+        isDetailsFragment = true;
+    }
+
+    @Override
+    public int getCount() {
+        return count;
+    }
+
+    @Override
+    public void mapUpdated(int size) {
+        if (resultList.size() != size) {
+            Toast.makeText(this, "Not all results were clustered. Retrying!!", Toast.LENGTH_SHORT).show();
             mapViewFragment.updateView(resultList);
         }
     }
 
-    @Override
-    public void showDetails(CustomClusterItem customClusterItem) {
 
+    @Override
+    public void closeFAB() {
+        if (isFabMenuOpen)
+            hideMenu();
     }
+
 
     @Override
     public void onBackPressed() {
+        if (getFragmentManager().findFragmentByTag(TAG_DETAILS) != null) {
+            showFabsandSearch();
+            isDetailsFragment = false;
+        } else {
+            if (activeFragmentTag.equals(TAG_LIST)) {
+                activeFragmentTag = TAG_MAP;
+            }
+        }
         if(isFabMenuOpen)
             hideMenu();
         else
             super.onBackPressed();
     }
+
+    public void onListItemClicked(final Result result) {
+        if (isFabMenuOpen)
+            hideMenu();
+        Picasso.with(this).load(result.getIcon()).placeholder(R.drawable.ic_marker_placeholder).into(new Target() {
+            @Override
+            public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+                DetailsFragment detailsFragment = DetailsFragment.newInstance(result.getName(), result.getGeometry().getLocation().getLat().toString(),
+                        result.getGeometry().getLocation().getLng().toString(), result.getAddress(), result.getRating(), bitmap);
+                getFragmentManager().beginTransaction()
+                        .add(R.id.fragment_container, detailsFragment, TAG_DETAILS)
+                        .addToBackStack(TAG_DETAILS).commit();
+                isDetailsFragment = true;
+                hideFabsandSearch();
+            }
+
+            @Override
+            public void onBitmapFailed(Drawable errorDrawable) {
+
+            }
+
+            @Override
+            public void onPrepareLoad(Drawable placeHolderDrawable) {
+
+            }
+        });
+
+    }
+
+    void hideFabsandSearch() {
+        searchView.setVisibility(View.INVISIBLE);
+        fabMain.setVisibility(View.INVISIBLE);
+        fabList.setVisibility(View.INVISIBLE);
+        fabMap.setVisibility(View.INVISIBLE);
+    }
+
+    void showFabsandSearch() {
+        searchView.setVisibility(View.VISIBLE);
+        fabMain.setVisibility(View.VISIBLE);
+        fabList.setVisibility(View.VISIBLE);
+        fabMap.setVisibility(View.VISIBLE);
+    }
+
 }

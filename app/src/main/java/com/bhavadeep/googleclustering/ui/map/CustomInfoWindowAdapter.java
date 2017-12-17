@@ -15,13 +15,13 @@ public class CustomInfoWindowAdapter implements GoogleMap.InfoWindowAdapter {
 
     private final View view;
 
-    void setItemClicked(CustomClusterItem itemClicked) {
+    public void setItemClicked(CustomClusterItem itemClicked) {
         this.itemClicked = itemClicked;
     }
 
     private CustomClusterItem itemClicked;
 
-    CustomInfoWindowAdapter(Context context) {
+    public CustomInfoWindowAdapter(Context context) {
         view = ((LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.info_window, null, false);
 
     }
@@ -41,8 +41,11 @@ public class CustomInfoWindowAdapter implements GoogleMap.InfoWindowAdapter {
             titleTextView.setText(itemClicked.getTitle());
             locationTextView.setText(itemClicked.getPosition().toString());
             addressTextView.setText(itemClicked.getAddress());
-            String ratings = "Ratings : " + itemClicked.getRatings();
-            ratingTextView.setText(ratings);
+            if (itemClicked.getRatings() != null) {
+                String ratings = "Ratings : " + itemClicked.getRatings();
+                ratingTextView.setText(ratings);
+            } else
+                ratingTextView.setVisibility(View.GONE);
         }
         return view;
     }

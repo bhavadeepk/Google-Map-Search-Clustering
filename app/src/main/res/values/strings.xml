@@ -3,11 +3,12 @@
     <string name="title_activity_maps">Map</string>
     <string name="title">Title</string>
     <string name="icon">Icon</string>
-    <string name="latitude">Latitude</string>
+    <string name="latitude">Latitude :</string>
     <string name="latitude_value">Latitude Value</string>
     <string name="address">Address</string>
     <string name="ratings">Ratings :</string>
     <string name="longitude">Longitude :</string>
     <string name="longitude_value">Longitude Value</string>
     <string name="rating_value">Rating Value</string>
+    <string name="cluster">cluster</string>
 </resources>

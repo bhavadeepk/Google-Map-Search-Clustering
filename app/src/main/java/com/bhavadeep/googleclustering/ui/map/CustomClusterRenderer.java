@@ -17,14 +17,13 @@ import com.google.maps.android.clustering.view.DefaultClusterRenderer;
 import com.google.maps.android.ui.IconGenerator;
 
 
-public class CustomClusterRenderer extends DefaultClusterRenderer<CustomClusterItem> implements ClusterManager.OnClusterItemClickListener<CustomClusterItem> {
+public class CustomClusterRenderer extends DefaultClusterRenderer<CustomClusterItem> {
 
     private final int dimension;
     private final int padding;
     private IconGenerator singleIconGenerator;
     private IconGenerator clusterIconGenerator;
     private ImageView singleIconView;
-    private CustomInfoWindowAdapter infoWindowAdapter;
 
     public CustomClusterRenderer(Context context, GoogleMap map, ClusterManager<CustomClusterItem> clusterManager) {
         super(context, map, clusterManager);
@@ -35,10 +34,6 @@ public class CustomClusterRenderer extends DefaultClusterRenderer<CustomClusterI
         dimension = (int) context.getResources().getDimension(R.dimen._50dp);
         padding = (int) context.getResources().getDimension(R.dimen._5dp);
         clusterIconGenerator.setContentView(clusterView);
-        clusterManager.setOnClusterItemClickListener(this);
-        infoWindowAdapter = new CustomInfoWindowAdapter(context);
-        map.setOnMarkerClickListener(clusterManager);
-        clusterManager.getMarkerCollection().setOnInfoWindowAdapter(infoWindowAdapter);
     }
 
     @Override
@@ -77,10 +72,5 @@ public class CustomClusterRenderer extends DefaultClusterRenderer<CustomClusterI
         markerOptions.icon(BitmapDescriptorFactory.fromBitmap(bitmap));
     }
 
-    @Override
-    public boolean onClusterItemClick(CustomClusterItem customClusterItem) {
-        infoWindowAdapter.setItemClicked(customClusterItem);
-        return false;
-    }
 }
 

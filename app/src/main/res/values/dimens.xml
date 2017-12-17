@@ -4,4 +4,6 @@
     <dimen name="_150dp">150dp</dimen>
     <dimen name="_100dp">100dp</dimen>
     <dimen name="_5dp">5dp</dimen>
+    <dimen name="_200dp">200dp</dimen>
+    <dimen name="_10dp">10dp</dimen>
 </resources>
