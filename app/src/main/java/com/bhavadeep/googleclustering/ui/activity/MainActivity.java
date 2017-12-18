@@ -196,12 +196,9 @@ public class MainActivity extends AppCompatActivity implements MapViewFragment.O
 
     @Override
     public void updateView(List<Result> results) {
-        Realm realm = Realm.getDefaultInstance();
-        RealmResults<Result> resultsRealm = realm.where(Result.class).equalTo("query", query).findAll();
-        Toast.makeText(this, "Realm Count : " + String.valueOf(resultsRealm.size()), Toast.LENGTH_SHORT).show();
         resultList.clear();
-        count = resultsRealm.size();
-        resultList.addAll(resultsRealm);
+        count = results.size();
+        resultList.addAll(results);
         if(newQuery) {
             Log.d("Main Activity", "New Query Update view");
             mapViewFragment.updateView(resultList);
