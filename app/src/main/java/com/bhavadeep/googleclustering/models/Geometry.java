@@ -3,7 +3,9 @@ package com.bhavadeep.googleclustering.models;
 
 import com.google.gson.annotations.Expose;
 
-public class Geometry {
+import io.realm.RealmObject;
+
+public class Geometry extends RealmObject {
 
     @Expose
     private Location location;

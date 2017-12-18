@@ -18,7 +18,7 @@ import android.widget.Toast;
 import com.bhavadeep.googleclustering.models.Result;
 import com.bhavadeep.googleclustering.R;
 import com.bhavadeep.googleclustering.ui.adapters.HorizontalRecyclerAdapter;
-import com.bhavadeep.googleclustering.ui.map.CustomClusterItem;
+import com.bhavadeep.googleclustering.models.CustomClusterItem;
 import com.bhavadeep.googleclustering.ui.map.CustomClusterRenderer;
 import com.bhavadeep.googleclustering.ui.adapters.CustomInfoWindowAdapter;
 import com.google.android.gms.maps.CameraUpdateFactory;

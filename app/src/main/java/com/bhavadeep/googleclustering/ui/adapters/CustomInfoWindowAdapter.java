@@ -1,13 +1,12 @@
 package com.bhavadeep.googleclustering.ui.adapters;
 
-import android.app.Activity;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.TextView;
 
 import com.bhavadeep.googleclustering.R;
-import com.bhavadeep.googleclustering.ui.map.CustomClusterItem;
+import com.bhavadeep.googleclustering.models.CustomClusterItem;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.Marker;
 

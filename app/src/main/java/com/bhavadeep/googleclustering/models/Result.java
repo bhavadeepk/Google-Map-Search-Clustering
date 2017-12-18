@@ -7,7 +7,11 @@ import java.util.List;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class Result {
+import io.realm.RealmObject;
+import io.realm.annotations.Ignore;
+import io.realm.annotations.PrimaryKey;
+
+public class Result extends RealmObject {
 
     @SerializedName("formatted_address")
     @Expose
@@ -25,15 +29,28 @@ public class Result {
     private Geometry geometry;
     @Expose
     private String icon;
+    @PrimaryKey
     @Expose
     private String id;
     @Expose
     private String name;
+    @Ignore
     @SerializedName("opening_hours")
     @Expose
     private OpeningHours openingHours;
     @Expose
+    @Ignore
     private List<Photo> photos = null;
+
+    private String query;
+
+    public String getQuery() {
+        return query;
+    }
+
+    public void setQuery(String query) {
+        this.query = query;
+    }
 
     public String getRating() {
         return rating;

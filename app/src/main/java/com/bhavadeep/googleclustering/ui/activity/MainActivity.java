@@ -19,7 +19,7 @@ import com.bhavadeep.googleclustering.R;
 import com.bhavadeep.googleclustering.ui.fragments.DetailsFragment;
 import com.bhavadeep.googleclustering.ui.fragments.ListFragment;
 import com.bhavadeep.googleclustering.ui.fragments.MapViewFragment;
-import com.bhavadeep.googleclustering.ui.map.CustomClusterItem;
+import com.bhavadeep.googleclustering.models.CustomClusterItem;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.lapism.searchview.SearchView;
@@ -28,6 +28,9 @@ import com.squareup.picasso.Target;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import io.realm.Realm;
+import io.realm.RealmResults;
 
 public class MainActivity extends AppCompatActivity implements MapViewFragment.OnMapFragmentInteractionListener, IViewUpdater
         , ListFragment.OnListFragmentListener {
@@ -49,6 +52,7 @@ public class MainActivity extends AppCompatActivity implements MapViewFragment.O
     private final String TAG_DETAILS = "Details";
     private int count;
     private boolean isDetailsFragment = false;
+    private String query = "BBVA Compass";
 
     @SuppressLint("ClickableViewAccessibility")
     @Override
@@ -65,12 +69,13 @@ public class MainActivity extends AppCompatActivity implements MapViewFragment.O
             getFragmentManager().beginTransaction()
                     .add(R.id.fragment_container,mapViewFragment, TAG_MAP ).commit();
             activeFragmentTag = TAG_MAP;
-            presenter.getResults("BBVA Compass");
+            presenter.getResults(query);
         } else {
             mapViewFragment = (MapViewFragment) getFragmentManager().findFragmentByTag(TAG_MAP);
             listFragment = (ListFragment) getFragmentManager().findFragmentByTag(TAG_LIST);
             resultList.addAll(mapViewFragment.getResultList());
         }
+
         searchView = findViewById(R.id.search_view);
         fabMain = findViewById(R.id.floatingActionButton);
         fabList = findViewById(R.id.fab_list);
@@ -123,6 +128,7 @@ public class MainActivity extends AppCompatActivity implements MapViewFragment.O
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
+                MainActivity.this.query = query;
                 presenter.getResults(query);
                 newQuery = true;
                 searchView.close(true);
@@ -190,9 +196,12 @@ public class MainActivity extends AppCompatActivity implements MapViewFragment.O
 
     @Override
     public void updateView(List<Result> results) {
+        Realm realm = Realm.getDefaultInstance();
+        RealmResults<Result> resultsRealm = realm.where(Result.class).equalTo("query", query).findAll();
+        Toast.makeText(this, "Realm Count : " + String.valueOf(resultsRealm.size()), Toast.LENGTH_SHORT).show();
         resultList.clear();
-        count = results.size();
-        resultList.addAll(results);
+        count = resultsRealm.size();
+        resultList.addAll(resultsRealm);
         if(newQuery) {
             Log.d("Main Activity", "New Query Update view");
             mapViewFragment.updateView(resultList);

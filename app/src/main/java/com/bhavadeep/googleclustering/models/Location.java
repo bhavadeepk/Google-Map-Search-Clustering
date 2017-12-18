@@ -3,7 +3,9 @@ package com.bhavadeep.googleclustering.models;
 
 import com.google.gson.annotations.Expose;
 
-public class Location {
+import io.realm.RealmObject;
+
+public class Location extends RealmObject {
 
     @Expose
     private Double lat;
