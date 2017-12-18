@@ -24,11 +24,13 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.Custom
 
     private Context context;
     private List<Result> resultList;
+    OnListItemClickedLister listener;
 
-    public RecyclerAdapter(Context context, List<Result> results) {
+    public RecyclerAdapter(Context context, List<Result> results, OnListItemClickedLister listener) {
         this.context = context;
         resultList = new ArrayList<>();
         resultList = results;
+        this.listener = listener;
     }
 
     @Override
@@ -82,10 +84,13 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.Custom
             view.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    ((MainActivity) context).onListItemClicked(resultList.get(getAdapterPosition()));
+                    listener.onListItemClicked(getAdapterPosition());
                 }
             });
-
         }
+    }
+
+    public interface OnListItemClickedLister {
+        void onListItemClicked(int position);
     }
 }

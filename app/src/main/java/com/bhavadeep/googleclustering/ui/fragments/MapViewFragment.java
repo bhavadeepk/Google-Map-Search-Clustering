@@ -45,7 +45,8 @@ import java.util.List;
 public class MapViewFragment extends Fragment implements OnMapReadyCallback,
         ClusterManager.OnClusterItemInfoWindowClickListener<CustomClusterItem>,
         ClusterManager.OnClusterClickListener<CustomClusterItem>,
-        ClusterManager.OnClusterItemClickListener<CustomClusterItem> {
+        ClusterManager.OnClusterItemClickListener<CustomClusterItem>,
+        HorizontalRecyclerAdapter.OnCircularMenuItemClicedListener {
 
     private MapView mapView;
     Target target;
@@ -159,7 +160,7 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback,
         if (results.size() == listener.getCount() && !results.isEmpty()) {
             resultList.clear();
             resultList.addAll(results);
-            adapter = new HorizontalRecyclerAdapter(context, resultList);
+            adapter = new HorizontalRecyclerAdapter(context, resultList, this);
             horizontalRcv.setAdapter(adapter);
         } else {
             if (reloadCount < 1) {
@@ -300,6 +301,7 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback,
             LatLng unitedStatesLatLng = new LatLng(45, -100);
             googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(unitedStatesLatLng, (float) 3.4));
         }
+        horizontalRcv.smoothScrollToPosition(0);
         if (itemClicked != null && clusterManager != null) {
             CustomClusterRenderer renderer = (CustomClusterRenderer) clusterManager.getRenderer();
             Marker marker = renderer.getMarker(itemClicked);
@@ -312,11 +314,17 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback,
     @Override
     public boolean onClusterItemClick(CustomClusterItem customClusterItem) {
         itemClicked = customClusterItem;
-        int zoom = (int) googleMap.getCameraPosition().zoom;
         infoWindowAdapter.setItemClicked(customClusterItem);
         return false;
     }
 
+    @Override
+    public void onCircularMenuItemClicked(int position) {
+        CustomClusterItem item = ((List<CustomClusterItem>) clusterManager.getAlgorithm().getItems()).get(position);
+        if (item != null) {
+            googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(item.getPosition(), 12), 1000, null);
+        }
+    }
 
 
     public interface OnMapFragmentInteractionListener{

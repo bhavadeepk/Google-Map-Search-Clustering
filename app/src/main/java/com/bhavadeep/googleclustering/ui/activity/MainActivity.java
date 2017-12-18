@@ -214,6 +214,35 @@ public class MainActivity extends AppCompatActivity implements MapViewFragment.O
     }
 
     @Override
+    public void onListItemClicked(final Result result) {
+        if (isFabMenuOpen)
+            hideMenu();
+        Picasso.with(this).load(result.getIcon()).placeholder(R.drawable.ic_marker_placeholder).into(new Target() {
+            @Override
+            public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+                DetailsFragment detailsFragment = DetailsFragment.newInstance(result.getName(), result.getGeometry().getLocation().getLat().toString(),
+                        result.getGeometry().getLocation().getLng().toString(), result.getAddress(), result.getRating(), bitmap);
+                getFragmentManager().beginTransaction()
+                        .add(R.id.fragment_container, detailsFragment, TAG_DETAILS)
+                        .addToBackStack(TAG_DETAILS).commit();
+                isDetailsFragment = true;
+                hideFabsandSearch();
+            }
+
+            @Override
+            public void onBitmapFailed(Drawable errorDrawable) {
+
+            }
+
+            @Override
+            public void onPrepareLoad(Drawable placeHolderDrawable) {
+
+            }
+        });
+
+    }
+
+    @Override
     public void getListData() {
         Log.d("MainActivity", "Sending to List View");
         listFragment.updateView(resultList);
@@ -287,33 +316,6 @@ public class MainActivity extends AppCompatActivity implements MapViewFragment.O
         }
     }
 
-    public void onListItemClicked(final Result result) {
-        if (isFabMenuOpen)
-            hideMenu();
-        Picasso.with(this).load(result.getIcon()).placeholder(R.drawable.ic_marker_placeholder).into(new Target() {
-            @Override
-            public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
-                DetailsFragment detailsFragment = DetailsFragment.newInstance(result.getName(), result.getGeometry().getLocation().getLat().toString(),
-                        result.getGeometry().getLocation().getLng().toString(), result.getAddress(), result.getRating(), bitmap);
-                getFragmentManager().beginTransaction()
-                        .add(R.id.fragment_container, detailsFragment, TAG_DETAILS)
-                        .addToBackStack(TAG_DETAILS).commit();
-                isDetailsFragment = true;
-                hideFabsandSearch();
-            }
-
-            @Override
-            public void onBitmapFailed(Drawable errorDrawable) {
-
-            }
-
-            @Override
-            public void onPrepareLoad(Drawable placeHolderDrawable) {
-
-            }
-        });
-
-    }
 
     void hideFabsandSearch() {
         searchView.setVisibility(View.INVISIBLE);

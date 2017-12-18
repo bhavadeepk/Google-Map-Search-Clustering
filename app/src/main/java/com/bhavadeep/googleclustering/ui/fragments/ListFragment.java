@@ -18,7 +18,7 @@ import com.bhavadeep.googleclustering.ui.adapters.RecyclerAdapter;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ListFragment extends Fragment{
+public class ListFragment extends Fragment implements RecyclerAdapter.OnListItemClickedLister {
     Context context;
     List<Result> resultList;
     RecyclerAdapter recyclerAdapter;
@@ -55,7 +55,7 @@ public class ListFragment extends Fragment{
         rootView = inflater.inflate(R.layout.fragment_list_places, container, false);
         RecyclerView rcv = rootView.findViewById(R.id.recycler_grid_view);
         GridLayoutManager layoutManager = new GridLayoutManager(context, 2);
-        recyclerAdapter = new RecyclerAdapter(getActivity(), resultList);
+        recyclerAdapter = new RecyclerAdapter(getActivity(), resultList, this);
         rcv.setAdapter(recyclerAdapter);
         rcv.setLayoutManager(layoutManager);
         if (resultList.isEmpty())
@@ -80,8 +80,14 @@ public class ListFragment extends Fragment{
         recyclerAdapter.notifyDataSetChanged();
     }
 
+    @Override
+    public void onListItemClicked(int position) {
+        listener.onListItemClicked(resultList.get(position));
+    }
+
 
     public interface OnListFragmentListener {
+        void onListItemClicked(Result result);
         void getListData();
     }
 }

@@ -19,11 +19,13 @@ public class HorizontalRecyclerAdapter extends RecyclerView.Adapter<HorizontalRe
 
     private final Context context;
     private ArrayList<Result> resultList;
+    OnCircularMenuItemClicedListener listener;
 
-    public HorizontalRecyclerAdapter(Context context, List<Result> resultList) {
+    public HorizontalRecyclerAdapter(Context context, List<Result> resultList, OnCircularMenuItemClicedListener listener) {
         this.context = context;
         this.resultList = new ArrayList<>();
         this.resultList.addAll(resultList);
+        this.listener = listener;
     }
 
     @Override
@@ -56,6 +58,16 @@ public class HorizontalRecyclerAdapter extends RecyclerView.Adapter<HorizontalRe
             super(itemView);
             titleTextView = itemView.findViewById(R.id.title_circle);
             ratingBar = itemView.findViewById(R.id.ratingBar_circle);
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    listener.onCircularMenuItemClicked(getAdapterPosition());
+                }
+            });
         }
+    }
+
+    public interface OnCircularMenuItemClicedListener {
+        void onCircularMenuItemClicked(int position);
     }
 }
