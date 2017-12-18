@@ -36,6 +36,6 @@ Hoping to learn on the go :+1:
 <img src="https://user-images.githubusercontent.com/24377762/34129381-f5866e9a-e411-11e7-92ed-a2aad126d0e5.png" width = "300" height = "480"/>
 <img src="https://user-images.githubusercontent.com/24377762/34129379-f55f9e00-e411-11e7-9bb1-5e31e58deb5b.png" width = "300" height = "480"/>
 <img src="https://user-images.githubusercontent.com/24377762/34129380-f5746074-e411-11e7-838f-bb1249723101.png" width = "300" height = "480"/>
-![screenshot_20171218-161553](https://user-images.githubusercontent.com/24377762/34129375-f4d934e6-e411-11e7-9634-1db1453c6696.png)
+[screenshot_20171218-161553](https://user-images.githubusercontent.com/24377762/34129375-f4d934e6-e411-11e7-9634-1db1453c6696.png)
 
 
