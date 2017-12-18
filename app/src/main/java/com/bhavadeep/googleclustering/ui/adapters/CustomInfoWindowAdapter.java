@@ -1,4 +1,4 @@
-package com.bhavadeep.googleclustering.ui.map;
+package com.bhavadeep.googleclustering.ui.adapters;
 
 import android.app.Activity;
 import android.content.Context;
@@ -7,6 +7,7 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.bhavadeep.googleclustering.R;
+import com.bhavadeep.googleclustering.ui.map.CustomClusterItem;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.Marker;
 
@@ -34,12 +35,10 @@ public class CustomInfoWindowAdapter implements GoogleMap.InfoWindowAdapter {
     @Override
     public View getInfoContents(Marker marker) {
         TextView titleTextView = view.findViewById(R.id.title_info);
-        TextView locationTextView = view.findViewById(R.id.location_info);
         TextView addressTextView = view.findViewById(R.id.address_info);
         TextView ratingTextView = view.findViewById(R.id.ratings_info);
         if (itemClicked != null) {
             titleTextView.setText(itemClicked.getTitle());
-            locationTextView.setText(itemClicked.getPosition().toString());
             addressTextView.setText(itemClicked.getAddress());
             if (itemClicked.getRatings() != null) {
                 String ratings = "Ratings : " + itemClicked.getRatings();

@@ -4,6 +4,7 @@ package com.bhavadeep.googleclustering.ui.activity;
 import android.annotation.SuppressLint;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
+import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -115,16 +116,7 @@ public class MainActivity extends AppCompatActivity implements MapViewFragment.O
         searchView.setOnMenuClickListener(new SearchView.OnMenuClickListener() {
             @Override
             public void onMenuClick() {
-                if (activeFragmentTag.equals(TAG_LIST)) {
-                    onBackPressed();
-                } else {
-                    if (backCount > 0)
-                        onBackPressed();
-                    else {
-                        Toast.makeText(MainActivity.this, "Press again to Exit", Toast.LENGTH_SHORT).show();
-                        backCount++;
-                    }
-                }
+                onBackPressed();
             }
         });
 
@@ -204,7 +196,8 @@ public class MainActivity extends AppCompatActivity implements MapViewFragment.O
         if(newQuery) {
             Log.d("Main Activity", "New Query Update view");
             mapViewFragment.updateView(resultList);
-            listFragment.updateView(resultList);
+            if (listFragment != null)
+                listFragment.updateView(resultList);
             newQuery = false;
         }
     }
@@ -216,12 +209,13 @@ public class MainActivity extends AppCompatActivity implements MapViewFragment.O
 
     @Override
     public void getData() {
-            Log.d("MainActivity", "Sending to Map Update View");
+        Log.d("MainActivity", "Sending to Map View");
             mapViewFragment.updateView(resultList);
     }
 
     @Override
     public void getListData() {
+        Log.d("MainActivity", "Sending to List View");
         listFragment.updateView(resultList);
     }
 
@@ -266,15 +260,31 @@ public class MainActivity extends AppCompatActivity implements MapViewFragment.O
         if (getFragmentManager().findFragmentByTag(TAG_DETAILS) != null) {
             showFabsandSearch();
             isDetailsFragment = false;
+            super.onBackPressed();
         } else {
-            if (activeFragmentTag.equals(TAG_LIST)) {
-                activeFragmentTag = TAG_MAP;
+            if (isFabMenuOpen)
+                hideMenu();
+            else {
+                if (activeFragmentTag.equals(TAG_LIST)) {
+                    activeFragmentTag = TAG_MAP;
+                    super.onBackPressed();
+                } else if (activeFragmentTag.equals(TAG_MAP)) {
+                    if (backCount == 0) {
+                        Toast.makeText(MainActivity.this, "Press again to Exit", Toast.LENGTH_SHORT).show();
+                        mapViewFragment.setDefaultCamera();
+                        backCount++;
+                        new Handler().postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                backCount = 0;
+                            }
+                        }, 2000);
+                    } else {
+                        super.onBackPressed();
+                    }
+                }
             }
         }
-        if(isFabMenuOpen)
-            hideMenu();
-        else
-            super.onBackPressed();
     }
 
     public void onListItemClicked(final Result result) {

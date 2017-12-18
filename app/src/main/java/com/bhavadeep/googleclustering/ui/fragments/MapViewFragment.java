@@ -7,6 +7,8 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,9 +17,10 @@ import android.widget.Toast;
 
 import com.bhavadeep.googleclustering.models.Result;
 import com.bhavadeep.googleclustering.R;
+import com.bhavadeep.googleclustering.ui.adapters.HorizontalRecyclerAdapter;
 import com.bhavadeep.googleclustering.ui.map.CustomClusterItem;
 import com.bhavadeep.googleclustering.ui.map.CustomClusterRenderer;
-import com.bhavadeep.googleclustering.ui.map.CustomInfoWindowAdapter;
+import com.bhavadeep.googleclustering.ui.adapters.CustomInfoWindowAdapter;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
@@ -25,6 +28,7 @@ import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.Marker;
 import com.google.maps.android.clustering.Cluster;
 import com.google.maps.android.clustering.ClusterItem;
 import com.google.maps.android.clustering.ClusterManager;
@@ -51,6 +55,9 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback,
     List<Result> resultList;
     private CustomInfoWindowAdapter infoWindowAdapter;
     private CustomClusterItem itemClicked;
+    private RecyclerView horizontalRcv;
+    private HorizontalRecyclerAdapter adapter;
+    private int reloadCount = 0;
 
     public List<Result> getResultList() {
         return resultList;
@@ -81,6 +88,9 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback,
             mapView = rootView.findViewById(R.id.map_view);
             mapView.onCreate(savedInstanceState);
             initMap();
+            horizontalRcv = rootView.findViewById(R.id.top_horizontal_recycler_view);
+            LinearLayoutManager layoutManager = new LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false);
+            horizontalRcv.setLayoutManager(layoutManager);
             setRetainInstance(true);
         }
         return rootView;
@@ -98,8 +108,7 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback,
         Log.d("Map Fragment", "OnMapReady");
         googleMap = gMap;
         MapsInitializer.initialize(context);
-        LatLng unitedStatesLatLng = new LatLng(45,-100);
-        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(unitedStatesLatLng, (float) 3.4));
+        setDefaultCamera();
         googleMap.getUiSettings().setMapToolbarEnabled(false);
         googleMap.setOnMapLoadedCallback(new GoogleMap.OnMapLoadedCallback() {
             @Override
@@ -150,9 +159,11 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback,
         if (results.size() == listener.getCount() && !results.isEmpty()) {
             resultList.clear();
             resultList.addAll(results);
+            adapter = new HorizontalRecyclerAdapter(context, resultList);
+            horizontalRcv.setAdapter(adapter);
         } else {
-            if (count < 1) {
-                count++;
+            if (reloadCount < 1) {
+                reloadCount++;
                 Toast.makeText(context, "List empty : Trying again", Toast.LENGTH_SHORT).show();
                 Handler handler = new Handler();
                 handler.postDelayed(new Runnable() {
@@ -186,41 +197,47 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback,
                 final String name = result.getName();
                 final String address = result.getAddress();
                 final String ratings = result.getRating();
-                target = new Target() {
 
+                //Target with callbacks to load icons for markers
+                target = new Target() {
                     @Override
                     public int hashCode() {
                         return (new Object()).hashCode();
                     }
 
                     @Override
-            public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+                    public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
                         Log.d("Picasso:", "OnBitmapLoaded");
+
+                        //Once we have an icon loaded them create a Cluster item and add it to cluster manager
                         CustomClusterItem item = new CustomClusterItem(latLng, name, address, ratings, bitmap);
                         clusterManager.addItem(item);
                         count++;
                         if (count == resultList.size()) {
                             clusterManager.cluster();
                             setCamera(clusterManager);
-                            //Check until all the result are loaded on the map
-                            listener.mapUpdated(clusterManager.getAlgorithm().getItems().size());
+                        } else if (count == 1 && resultList.indexOf(result) == resultList.size() - 1) {
+                            listener.getData();
                         }
-            }
+                    }
 
-            @Override
-            public void onBitmapFailed(Drawable errorDrawable) {
-                Log.d("Picasso:", "OnBitmapFailed");
-            }
+                    @Override
+                    public void onBitmapFailed(Drawable errorDrawable) {
+                        Log.d("Picasso:", "OnBitmapFailed");
+                    }
 
-            @Override
-            public void onPrepareLoad(Drawable placeHolderDrawable) {
-            }
-        };
-                Picasso.with(context).load(result.getIcon()).memoryPolicy(MemoryPolicy.NO_CACHE, MemoryPolicy.NO_STORE).into(target);
+                    @Override
+                    public void onPrepareLoad(Drawable placeHolderDrawable) {
+                    }
+                };
 
+                //Loading icons into the target
+                Picasso.with(context).load(result.getIcon()).memoryPolicy(MemoryPolicy.NO_CACHE, MemoryPolicy.NO_STORE)
+                        .into(target);
             }
-}
-        else {
+            //Check until all the result are loaded on the map
+            //listener.mapUpdated(count);
+        } else {
             Toast.makeText(context, "Maps loaded late. Re-clustering!!", Toast.LENGTH_SHORT).show();
                 listener.getData();
                 }
@@ -262,22 +279,41 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback,
         for (CustomClusterItem item : clusterManager.getAlgorithm().getItems()) {
             builder.include(item.getPosition());
         }
+
+        // To leave a little space in the north for recycler view
+        // builder.include(new LatLng(55, -110));
         // Get the LatLngBounds
         final LatLngBounds bounds = builder.build();
 
         // Animate camera to the bounds
         try {
-            getGoogleMap().animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 4));
+            getGoogleMap().animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 100));
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
+    public void setDefaultCamera() {
+        GoogleMap googleMap = getGoogleMap();
+
+        if (googleMap != null) {
+            LatLng unitedStatesLatLng = new LatLng(45, -100);
+            googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(unitedStatesLatLng, (float) 3.4));
+        }
+        if (itemClicked != null && clusterManager != null) {
+            CustomClusterRenderer renderer = (CustomClusterRenderer) clusterManager.getRenderer();
+            Marker marker = renderer.getMarker(itemClicked);
+            if (marker != null) {
+                marker.hideInfoWindow();
+            }
+        }
+    }
 
     @Override
     public boolean onClusterItemClick(CustomClusterItem customClusterItem) {
-        infoWindowAdapter.setItemClicked(customClusterItem);
         itemClicked = customClusterItem;
+        int zoom = (int) googleMap.getCameraPosition().zoom;
+        infoWindowAdapter.setItemClicked(customClusterItem);
         return false;
     }
 
