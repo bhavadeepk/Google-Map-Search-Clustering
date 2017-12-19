@@ -4,8 +4,19 @@ package com.bhavadeep.googleclustering.models;
 import com.google.gson.annotations.Expose;
 
 import io.realm.RealmObject;
+import io.realm.annotations.PrimaryKey;
 
 public class Location extends RealmObject {
+    @PrimaryKey
+    private int uGID;
+
+    public int getuGID() {
+        return uGID;
+    }
+
+    public void setuGID(int uGID) {
+        this.uGID = uGID;
+    }
 
     @Expose
     private Double lat;
@@ -19,11 +30,7 @@ public class Location extends RealmObject {
     public Location() {
     }
 
-    /**
-     * 
-     * @param lng
-     * @param lat
-     */
+
     public Location(Double lat, Double lng) {
         super();
         this.lat = lat;

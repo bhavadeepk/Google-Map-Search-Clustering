@@ -23,7 +23,7 @@ public class MainPresenter implements IViewPresenter {
 
     @Override
     public void getResults(String query){
-        onModelLoadListner = new OnLoadFinishListener() {
+        interactor = new Interactor(onModelLoadListner = new OnLoadFinishListener() {
             @Override
             public void OnLoadFinish(List<Result> results) {
                 updater.updateView(results);
@@ -33,8 +33,7 @@ public class MainPresenter implements IViewPresenter {
             public void OnLoadFailed(String message) {
                 updater.updateFailed(message);
             }
-        };
-        interactor = new Interactor(onModelLoadListner);
+        });
         interactor.loadResults(query);
 
     }

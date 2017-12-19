@@ -281,9 +281,7 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback,
             builder.include(item.getPosition());
         }
 
-        // To leave a little space in the north for recycler view
-        // builder.include(new LatLng(55, -110));
-        // Get the LatLngBounds
+
         final LatLngBounds bounds = builder.build();
 
         // Animate camera to the bounds
@@ -300,6 +298,9 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback,
         if (googleMap != null) {
             LatLng unitedStatesLatLng = new LatLng(45, -100);
             googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(unitedStatesLatLng, (float) 3.4));
+        }
+        if (clusterManager != null) {
+            clusterManager.cluster();
         }
         horizontalRcv.smoothScrollToPosition(0);
         if (itemClicked != null && clusterManager != null) {

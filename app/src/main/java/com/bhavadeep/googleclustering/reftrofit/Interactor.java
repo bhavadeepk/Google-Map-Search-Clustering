@@ -6,6 +6,8 @@ import android.widget.Toast;
 
 import com.bhavadeep.googleclustering.BuildConfig;
 import com.bhavadeep.googleclustering.models.APIResult;
+import com.bhavadeep.googleclustering.models.Geometry;
+import com.bhavadeep.googleclustering.models.Location;
 import com.bhavadeep.googleclustering.models.Result;
 import com.bhavadeep.googleclustering.presenter.IModelInteractor;
 import com.bhavadeep.googleclustering.presenter.OnLoadFinishListener;
@@ -28,7 +30,7 @@ public class Interactor implements Callback<APIResult>, IModelInteractor {
     private final String region = "us";
     private final String  API_KEY = BuildConfig.GOOGLE_MAPS_API_KEY_UNREGISTERED ;
     private String query = "";
-    Realm realm;
+    private Realm realm;
 
     public Interactor(OnLoadFinishListener loadFinshListener) {
         listener = loadFinshListener;
@@ -44,13 +46,17 @@ public class Interactor implements Callback<APIResult>, IModelInteractor {
                 if (apiResult != null) {
                     if (apiResult.getStatus().equals("OK")) {
                         final List<Result> results = apiResult.getResults();
-                        for (Result result : results) {
-                            result.setQuery(query);
-                        }
-
                         realm.executeTransaction(new Realm.Transaction() {
                             @Override
                             public void execute(@NonNull Realm realm) {
+                                for (int i = 0; i < results.size(); i++) {
+                                    Result result = results.get(i);
+                                    result.setQuery(query);
+                                    result.getGeometry().setuID(i);
+                                    result.getGeometry().getLocation().setuGID(i);
+                                    //result.getGeometry().setuID((int)(realm.where(Geometry.class).max("uID"))+1);
+                                    //result.getGeometry().getLocation().setuGID((int)(realm.where(Location.class).max("uGID"))+1);
+                                }
                                 realm.insertOrUpdate(results);
                             }
                         });

@@ -42,6 +42,7 @@ public class MainActivity extends AppCompatActivity implements MapViewFragment.O
     private boolean isFabMenuOpen = false;
     MapViewFragment mapViewFragment;
     ListFragment listFragment;
+    DetailsFragment detailsFragment;
     final String TAG_MAP = "Map";
     final String TAG_LIST = "List";
     String activeFragmentTag;
@@ -73,6 +74,8 @@ public class MainActivity extends AppCompatActivity implements MapViewFragment.O
         } else {
             mapViewFragment = (MapViewFragment) getFragmentManager().findFragmentByTag(TAG_MAP);
             listFragment = (ListFragment) getFragmentManager().findFragmentByTag(TAG_LIST);
+            isDetailsFragment = savedInstanceState.getBoolean("is_details_fragment");
+            detailsFragment = (DetailsFragment) getFragmentManager().findFragmentByTag(TAG_DETAILS);
             resultList.addAll(mapViewFragment.getResultList());
         }
 
@@ -91,9 +94,7 @@ public class MainActivity extends AppCompatActivity implements MapViewFragment.O
                     }
                 } else if (v.getId() == R.id.fab_map) {
                     hideMenu();
-                    if (activeFragmentTag.equals(TAG_LIST)) {/*
-                            getFragmentManager().beginTransaction().hide(getFragmentManager().findFragmentByTag(TAG_LIST))
-                                       .show(getFragmentManager().findFragmentByTag(TAG_MAP)).commit();*/
+                    if (activeFragmentTag.equals(TAG_LIST)) {
                         getFragmentManager().popBackStack();
                         activeFragmentTag = TAG_MAP;
 
@@ -117,6 +118,7 @@ public class MainActivity extends AppCompatActivity implements MapViewFragment.O
 
 
         searchView.setShouldClearOnClose(true);
+        searchView.setHint("Search Food, Hospitals, ATM ...");
         searchView.setArrowOnly(true);
         searchView.setOnMenuClickListener(new SearchView.OnMenuClickListener() {
             @Override
@@ -131,7 +133,7 @@ public class MainActivity extends AppCompatActivity implements MapViewFragment.O
                 MainActivity.this.query = query;
                 presenter.getResults(query);
                 newQuery = true;
-                searchView.close(true);
+                searchView.removeFocus();
                 return true;
             }
 
@@ -223,15 +225,15 @@ public class MainActivity extends AppCompatActivity implements MapViewFragment.O
     public void onListItemClicked(final Result result) {
         if (isFabMenuOpen)
             hideMenu();
+        isDetailsFragment = true;
         Picasso.with(this).load(result.getIcon()).placeholder(R.drawable.ic_marker_placeholder).into(new Target() {
             @Override
             public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
-                DetailsFragment detailsFragment = DetailsFragment.newInstance(result.getName(), result.getGeometry().getLocation().getLat().toString(),
+                detailsFragment = DetailsFragment.newInstance(result.getName(), result.getGeometry().getLocation().getLat().toString(),
                         result.getGeometry().getLocation().getLng().toString(), result.getAddress(), result.getRating(), bitmap);
                 getFragmentManager().beginTransaction()
                         .add(R.id.fragment_container, detailsFragment, TAG_DETAILS)
                         .addToBackStack(TAG_DETAILS).commit();
-                isDetailsFragment = true;
                 hideFabsandSearch();
             }
 
@@ -258,15 +260,15 @@ public class MainActivity extends AppCompatActivity implements MapViewFragment.O
     public void showDetails(CustomClusterItem item) {
         if (isFabMenuOpen)
             hideMenu();
+        isDetailsFragment = true;
         String latitude = String.valueOf(item.getPosition().latitude);
         String longitute = String.valueOf(item.getPosition().longitude);
-        DetailsFragment detailsFragment = DetailsFragment.newInstance(item.getTitle(), latitude, longitute, item.getAddress(),
+        detailsFragment = DetailsFragment.newInstance(item.getTitle(), latitude, longitute, item.getAddress(),
                 item.getRatings(), item.getBitmap());
         getFragmentManager().beginTransaction()
                 .replace(R.id.fragment_container, detailsFragment, TAG_DETAILS).addToBackStack(TAG_DETAILS)
                 .commit();
         hideFabsandSearch();
-        isDetailsFragment = true;
     }
 
     @Override
