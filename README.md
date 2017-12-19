@@ -33,6 +33,8 @@ Self training project focsing on third party libraries and dynamic fragment impl
 
 Hoping to learn on the go :+1:
 
+P.S. Add Google API Keys in the gradle.properties file for a working prototype
+
 #### Screenshots
 |  |  |
 | ------------- | ------------- |
