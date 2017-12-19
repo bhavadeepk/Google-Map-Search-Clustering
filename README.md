@@ -3,12 +3,13 @@
 Features:
 
  * Search any location or type(Eg. Food/Hospital/123 abc blvd..)
- * Upto 20 Markers around the US and 15,000 searches/day limit
+ * Retreive upto 20 markers around the US and 15,000 searches/day limit from google
+ * Implementing Realm database and storing a repository of places enables to show more markers on search
  * Recycler view displaying Places with details
- * Detailed view with further details on the place and option to navtigate to Google maps
+ * Detailed view with further details on the place and option to navtigate to device maps
 
 
-Self training project focsing on third party libraries.
+Self training project focsing on third party libraries and dynamic fragment implementation.
 
 #### Here's a list of libraries and techniques used!
 
@@ -16,9 +17,13 @@ Self training project focsing on third party libraries.
  * Retrofit
  * ButterKnife
  * MVP pattern
- * Glide and Picasso
+ * Glide/Picasso
  * Recycler views
  * Dynamic Fragments
+ * Realm Database
+ * Lapism SearchView
+ * Card view
+ * Flex Box
 
 #### Future 
  * Event bus
