@@ -7,6 +7,7 @@ Features:
  * Implementing Realm database and storing a repository of places enables to show more markers on search
  * Recycler view displaying Places with details
  * Detailed view with further details on the place and option to navtigate to device maps
+ * Orientation change handling by saving states of primitive data and retaining fragments
 
 
 Self training project focsing on third party libraries and dynamic fragment implementation.
