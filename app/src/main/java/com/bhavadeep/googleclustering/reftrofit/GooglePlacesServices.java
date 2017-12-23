@@ -9,8 +9,6 @@ import retrofit2.http.Query;
 
 public interface GooglePlacesServices {
     @GET("json")
-    Call<APIResult> listMasters(@Query("query") String searchString, @Query("location") String latLng, @Query("radius") int radius, @Query("key") String apiKey);
-    @GET("json")
     Call<APIResult> MastersinUS(@Query("query") String searchString, @Query("region") String region,  @Query("key") String apiKey);
 
 

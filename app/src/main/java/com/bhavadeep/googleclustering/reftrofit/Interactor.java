@@ -31,6 +31,7 @@ public class Interactor implements Callback<APIResult>, IModelInteractor {
     private final String  API_KEY = BuildConfig.GOOGLE_MAPS_API_KEY_UNREGISTERED ;
     private String query = "";
     private Realm realm;
+    private RealmResults<Result> dbResults;
 
     public Interactor(OnLoadFinishListener loadFinshListener) {
         listener = loadFinshListener;
@@ -49,18 +50,16 @@ public class Interactor implements Callback<APIResult>, IModelInteractor {
                         realm.executeTransaction(new Realm.Transaction() {
                             @Override
                             public void execute(@NonNull Realm realm) {
+                                realm.deleteAll();
                                 for (int i = 0; i < results.size(); i++) {
                                     Result result = results.get(i);
-                                    result.setQuery(query);
-                                    result.getGeometry().setuID(i);
-                                    result.getGeometry().getLocation().setuGID(i);
-                                    //result.getGeometry().setuID((int)(realm.where(Geometry.class).max("uID"))+1);
-                                    //result.getGeometry().getLocation().setuGID((int)(realm.where(Location.class).max("uGID"))+1);
+                                    result.setQuery(query.toLowerCase());
+                                    result.getGeometry().setuID(result.getId());
+                                    result.getGeometry().getLocation().setuGID(result.getId());
                                 }
                                 realm.insertOrUpdate(results);
                             }
                         });
-                        listener.OnLoadFinish(results);
                     } else {
                         Log.e("API ERROR :", apiResult.getStatus());
                         listener.OnLoadFailed(apiResult.getStatus());
@@ -69,23 +68,28 @@ public class Interactor implements Callback<APIResult>, IModelInteractor {
             } else {
                 listener.OnLoadFailed("Response Unsuccessful");
             }
+            dbResults = realm.where(Result.class).equalTo("query", query).findAll();
+            listener.OnLoadFinish(dbResults);
         }
     }
 
     @Override
     public void onFailure(@NonNull Call<APIResult> call, @NonNull Throwable t) {
         Log.e("Retrofit Failure :", t.getMessage());
-        listener.OnLoadFailed(t.getMessage());
+        dbResults = realm.where(Result.class).equalTo("query", query).findAll();
+        if (dbResults.isEmpty()) {
+            listener.OnLoadFailed("No local DB Results\n" + t.getMessage());
+        } else {
+            listener.OnLoadFinish(dbResults);
+            listener.OnLoadFailed(t.getMessage());
+        }
+
     }
 
     @Override
     public void loadResults(String query) {
-        this.query = query;
-        RealmResults<Result> results = realm.where(Result.class).equalTo("query", query).findAll();
-        if (results.isEmpty()) {
-            rf.getService().MastersinUS(query, region, API_KEY).enqueue(this);
-        } else {
-            listener.OnLoadFinish(results);
-        }
+        this.query = query.toLowerCase();
+        rf.getService().MastersinUS(query, region, API_KEY).enqueue(this);
+
     }
 }

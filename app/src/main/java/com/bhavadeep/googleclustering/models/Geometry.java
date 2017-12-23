@@ -8,7 +8,7 @@ import io.realm.annotations.PrimaryKey;
 
 public class Geometry extends RealmObject {
     @PrimaryKey
-    private int uID;
+    private String uID;
 
     @Expose
     private Location location;
@@ -34,11 +34,11 @@ public class Geometry extends RealmObject {
         this.location = location;
     }
 
-    public int getuID() {
+    public String getuID() {
         return uID;
     }
 
-    public void setuID(int uID) {
+    public void setuID(String uID) {
         this.uID = uID;
     }
 }

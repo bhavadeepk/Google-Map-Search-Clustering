@@ -2,6 +2,7 @@ package com.bhavadeep.googleclustering.ui.activity;
 
 
 import android.annotation.SuppressLint;
+import android.app.ProgressDialog;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.os.Handler;
@@ -28,6 +29,7 @@ import com.squareup.picasso.Target;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import io.realm.Realm;
 import io.realm.RealmResults;
@@ -54,6 +56,7 @@ public class MainActivity extends AppCompatActivity implements MapViewFragment.O
     private int count;
     private boolean isDetailsFragment = false;
     private String query = "BBVA Compass";
+    private ProgressDialog progressDialog;
 
     @SuppressLint("ClickableViewAccessibility")
     @Override
@@ -83,6 +86,7 @@ public class MainActivity extends AppCompatActivity implements MapViewFragment.O
         fabMain = findViewById(R.id.floatingActionButton);
         fabList = findViewById(R.id.fab_list);
         fabMap = findViewById(R.id.fab_map);
+        progressDialog = new ProgressDialog(this);
         View.OnClickListener fabClickListener = new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -130,15 +134,20 @@ public class MainActivity extends AppCompatActivity implements MapViewFragment.O
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                MainActivity.this.query = query;
-                presenter.getResults(query);
-                newQuery = true;
+                if (!MainActivity.this.query.equals(query)) {
+                    mapViewFragment.setDefaultCamera();
+                    MainActivity.this.query = query;
+                    presenter.getResults(query);
+                    newQuery = true;
+                    progressDialog.show();
+                }
                 searchView.removeFocus();
                 return true;
             }
 
             @Override
             public boolean onQueryTextChange(String newText) {
+
                 return false;
             }
         });
@@ -207,6 +216,7 @@ public class MainActivity extends AppCompatActivity implements MapViewFragment.O
             if (listFragment != null)
                 listFragment.updateView(resultList);
             newQuery = false;
+            progressDialog.dismiss();
         }
     }
 

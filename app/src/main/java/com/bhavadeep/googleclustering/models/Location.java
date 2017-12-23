@@ -8,13 +8,13 @@ import io.realm.annotations.PrimaryKey;
 
 public class Location extends RealmObject {
     @PrimaryKey
-    private int uGID;
+    private String uGID;
 
-    public int getuGID() {
+    public String getuGID() {
         return uGID;
     }
 
-    public void setuGID(int uGID) {
+    public void setuGID(String uGID) {
         this.uGID = uGID;
     }
 
