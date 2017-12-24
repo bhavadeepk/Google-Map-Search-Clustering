@@ -8,6 +8,7 @@ Features:
  * Recycler view displaying Places with details
  * Detailed view with further details on the place and option to navtigate to device maps
  * Orientation change handling by saving states of primitive data and retaining fragments
+ * Implemented EvenBus for loose coupling between non-android frameworks Model and Presenter
 
 
 Self training project focsing on third party libraries and dynamic fragment implementation.
@@ -25,9 +26,9 @@ Self training project focsing on third party libraries and dynamic fragment impl
  * Lapism SearchView
  * Card view
  * Flex Box
+ * Event bus
 
 #### Future 
- * Event bus
  * Rx Java
  * Dagger
 
