@@ -87,6 +87,7 @@ public class MainActivity extends AppCompatActivity implements MapViewFragment.O
         fabList = findViewById(R.id.fab_list);
         fabMap = findViewById(R.id.fab_map);
         progressDialog = new ProgressDialog(this);
+        progressDialog.setTitle("Loading...");
         View.OnClickListener fabClickListener = new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -223,6 +224,8 @@ public class MainActivity extends AppCompatActivity implements MapViewFragment.O
     @Override
     public void updateFailed(String message) {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+        if (progressDialog.isShowing())
+            progressDialog.dismiss();
     }
 
     @Override
