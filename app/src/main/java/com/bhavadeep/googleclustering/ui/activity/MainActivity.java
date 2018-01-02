@@ -1,7 +1,9 @@
 package com.bhavadeep.googleclustering.ui.activity;
 
 
+import android.animation.ObjectAnimator;
 import android.annotation.SuppressLint;
+import android.app.FragmentTransaction;
 import android.app.ProgressDialog;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
@@ -9,8 +11,10 @@ import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
+import android.view.animation.Animation;
 import android.widget.Toast;
 
 import com.bhavadeep.googleclustering.models.Result;
@@ -110,8 +114,11 @@ public class MainActivity extends AppCompatActivity implements MapViewFragment.O
                         if (listFragment == null) {
                             listFragment = ListFragment.newInstance();
                         }
-                        getFragmentManager().beginTransaction().add(R.id.fragment_container, listFragment, TAG_LIST)
-                                .addToBackStack(TAG_LIST).commit();
+                        FragmentTransaction transaction = getFragmentManager().beginTransaction();
+                        transaction.setCustomAnimations(R.animator.slide_in_up, 0, 0, R.animator.slide_out_down);
+                        transaction.addToBackStack(TAG_LIST);
+                        transaction.add(R.id.fragment_container, listFragment, TAG_LIST)
+                                .commit();
                         activeFragmentTag = TAG_LIST;
                     }
                 }
@@ -351,5 +358,6 @@ public class MainActivity extends AppCompatActivity implements MapViewFragment.O
         fabList.setVisibility(View.VISIBLE);
         fabMap.setVisibility(View.VISIBLE);
     }
+
 
 }
